@@ -14,5 +14,5 @@ Activity                :   Project Documentation
 - Allowing the user to edit or delete espicfic tasks that they created.
 
 #Members List :
-- Ronald Bagaporo Jr. [ Mofier / Editor ]
+- Ronald Bagaporo Jr. [ Modifier / Editor ]
 
