@@ -47,6 +47,9 @@ Your ultimate companion for seamless organization and task management. Developed
 - Allow users to set dependencies between tasks, ensuring that certain tasks cannot be started until others are completed.
 - Award points for the user after completing each task and display the points they've earned.
 - Display a dashboard that provides insights into the user's productivity trends over time.
+- Dark Mode and Light Mode themes
+- Activity Log
+- Weather check feature to plan tasks
 
 ## Group Members
 
