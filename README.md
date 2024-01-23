@@ -12,6 +12,8 @@ Activity                :   Project Documentation
 **App Features**
 - Allowing the user to create and manage their tasks.
 - Allowing the user to edit or delete espicfic tasks that they created.
+- Allowing the user to filter the list of tasks.
+- Allowing the user to set how long the tasks.[ Once, Daily, Weekly, Monthly ]
 - Saving, Extracting and Removing these data from a database.
 
 
