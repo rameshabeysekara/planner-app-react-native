@@ -40,6 +40,9 @@ Your ultimate companion for seamless organization and task management. Developed
 - Set task recurrence (Once, Daily, Weekly, Monthly).
 - Save, Extract, and Remove data from a database.
 - Study Timer for focused study sessions.
+- Display notification for timer(s) set.
+- Reminders to user for uncompleted tasks with deadlines.
+- Allow user delete all tasks (user data).
 
 ## Group Members
 
