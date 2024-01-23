@@ -9,10 +9,11 @@ Activity                :   Project Documentation
 - Tech Use           :   React Native
 - Description        :   ? ? ? ? ? ?
 
-#Applicaton Features    :
+**App Features**
 - Allowing the user to create and manage their tasks.
 - Allowing the user to edit or delete espicfic tasks that they created.
 
-#Members List :
+**Member List**
 - Ronald Bagaporo Jr. [ Modifier / Editor ]
+- Imasha Ekanayake [ Modifier / Editor ]
 
