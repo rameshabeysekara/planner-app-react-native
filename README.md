@@ -43,6 +43,10 @@ Your ultimate companion for seamless organization and task management. Developed
 - Display notification for timer(s) set.
 - Reminders to user for uncompleted tasks with deadlines.
 - Allow user delete all tasks (user data).
+- Allow user to assign priority levels to tasks (high, medium, low)
+- Allow users to set dependencies between tasks, ensuring that certain tasks cannot be started until others are completed.
+- Award points for the user after completing each task and display the points they've earned.
+- Display a dashboard that provides insights into the user's productivity trends over time.
 
 ## Group Members
 
