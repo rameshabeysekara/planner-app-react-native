@@ -38,11 +38,11 @@ Your ultimate companion for seamless organization and task management. Developed
 - Allow the user to filter the list of tasks.
 - Set a color coding tag for each tasks.
 - Set task recurrence (Once, Daily, Weekly, Monthly).
-- Save, Extract, and Remove data from a database.
+- Category based custom icon selection for tasks.
 - Study Timer for focused study sessions.
 - Display notification for timer(s) set.
 - Reminders to user for uncompleted tasks with deadlines.
-- Allow user delete all tasks (user data).
+- Allow user delete all tasks - app reset (user data).
 - Allow user to assign priority levels to tasks (high, medium, low).
 - Allow users to set dependencies between tasks, ensuring that certain tasks cannot be started until others are completed.
 - Award points for the user after completing each task and display the points they've earned.
