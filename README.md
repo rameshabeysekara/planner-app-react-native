@@ -34,9 +34,9 @@ Your ultimate companion for seamless organization and task management. Developed
 
 ## App Features
 
-- Allow the user to create and manage tasks.
-- Allow the user to edit or delete specific tasks.
+- Allow the user to create, manage, modify and withdraw tasks.
 - Allow the user to filter the list of tasks.
+- Set a color coding tag for each tasks.
 - Set task recurrence (Once, Daily, Weekly, Monthly).
 - Save, Extract, and Remove data from a database.
 - Study Timer for focused study sessions.
