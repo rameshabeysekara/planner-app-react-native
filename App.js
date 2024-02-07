@@ -3,10 +3,8 @@ import { AppRegistry } from "react-native";
 import { name as appName } from "./app.json";
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View } from "react-native";
-import {
-  MD3LightTheme as DefaultTheme,
-  PaperProvider,
-} from "react-native-paper";
+import {MD3LightTheme as DefaultTheme, PaperProvider} from "react-native-paper";
+import { FontAwesome5, Feather, AntDesign } from '@expo/vector-icons';
 import { NavigationContainer } from "@react-navigation/native";
 import { createMaterialBottomTabNavigator } from "react-native-paper/react-navigation";
 import Home from "./screens/Home";
@@ -28,8 +26,16 @@ export default function App() {
     <PaperProvider theme={theme}>
       <NavigationContainer>
         <Tab.Navigator>
-          <Tab.Screen name="Home" component={Home} />
-          <Tab.Screen name="Settings" component={Settings} />
+          <Tab.Screen name="Home" options={{
+            tabBarIcon: () => (
+              <Feather name="home" size={24}/>
+            ),
+          }} component={Home} />
+          <Tab.Screen name="Settings" options={{
+            tabBarIcon: () => (
+              <Feather name="settings" size={24}/>
+            ),
+          }} component={Settings} />
         </Tab.Navigator>
       </NavigationContainer>
     </PaperProvider>
