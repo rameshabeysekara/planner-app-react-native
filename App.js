@@ -4,11 +4,12 @@ import { name as appName } from "./app.json";
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View } from "react-native";
 import {MD3LightTheme as DefaultTheme, PaperProvider} from "react-native-paper";
-import { FontAwesome5, Feather, AntDesign } from '@expo/vector-icons';
+import { FontAwesome, Feather, AntDesign } from '@expo/vector-icons';
 import { NavigationContainer } from "@react-navigation/native";
 import { createMaterialBottomTabNavigator } from "react-native-paper/react-navigation";
 import Home from "./screens/Home";
 import Settings from "./screens/Settings";
+import Tasks from "./screens/Tasks";
 
 const Tab = createMaterialBottomTabNavigator();
 
@@ -28,9 +29,14 @@ export default function App() {
         <Tab.Navigator>
           <Tab.Screen name="Home" options={{
             tabBarIcon: () => (
-              <Feather name="home" size={24}/>
+              <FontAwesome name="home" size={24} color="black" />
             ),
           }} component={Home} />
+          <Tab.Screen name="Tasks" options={{
+            tabBarIcon: () => (
+              <FontAwesome name="tasks" size={24} color="black" />
+            ),
+          }} component={Tasks} />
           <Tab.Screen name="Settings" options={{
             tabBarIcon: () => (
               <Feather name="settings" size={24}/>
