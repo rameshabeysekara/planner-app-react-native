@@ -2,15 +2,16 @@ import { ADD_TODO, DELETE_TODO, UPDATE_TODO } from "./actionTypes";
 
 let nextTodoId = 0;
 
-export const addTodo = (title, task) => {
-  return {
-    type: ADD_TODO,
-    payload: {
-      id: ++nextTodoId,
-      title,
-      task,
-    },
-  };
+export const addTodo = (title, task, dependencyId) => {
+    return {
+      type: ADD_TODO,
+      payload: {
+        id: ++nextTodoId,
+        title,
+        task,
+        dependencyId
+      }
+    };
 };
 
 export const updateTodo = (id, title, task) => {

@@ -4,6 +4,7 @@ import Spacer from '../components/Spacer'
 import Constants from 'expo-constants'
 
 import { Text, View, StyleSheet, Modal, FlatList, Pressable, Alert } from "react-native"
+import { Dropdown } from 'react-native-element-dropdown';
 import { Button, TextInput, Card, Paragraph } from "react-native-paper"
 import { FontAwesome as Icon } from '@expo/vector-icons'
 import { connect } from 'react-redux'
@@ -16,19 +17,18 @@ const Home = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
   const [modalFormVisible, setModalFormVisible] = React.useState(false)
   const [title, setTitle] = React.useState('')
   const [task, setTask] = React.useState('')
+  const [selectedDependency, setSelectedDependency] = React.useState(null);
 
   const handleAddTodo = () => {
-    // addTodo (   title, task  )
-    // setTask (   ''  )
-    // setTitle (   ''  )
-    // setModalFormVisible (   false  )
     if (task.trim() !== '') {
       // Validation for not including title
       if (title.trim() !== '') {
 
-        addTodo(title, task)
+        addTodo(title, task, selectedDependency);
         setTask('')
         setTitle('')
+        setSelectedDependency(null)
+        setModalFormVisible(false)
 
       } else {
 
@@ -44,6 +44,7 @@ const Home = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
               addTodo('', task)
               setTask('')
               setTitle('')
+              setSelectedDependency(null)
               setModalFormVisible(false)
             },
           },
@@ -149,6 +150,21 @@ const Home = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
     )
   }
 
+  //get task list to the dropdown
+  const generateDropdownData = (todoList) => {
+    const dropdownData = todoList.map((todo) => ({
+      label: todo.title || '[ No Title ]',
+      value: todo.id,
+    }));
+
+    dropdownData.unshift({
+      label: 'No Dependency',
+      value: null,
+    });
+
+    return dropdownData;
+  };
+  
   return (
     <View style={styles.container}>
       <View style={styles.content}>
@@ -181,7 +197,7 @@ const Home = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
         <Button labelStyle={{ fontWeight: 'bold', color: 'white' }}
           style={{ backgroundColor: 'tomato' }}
           onPress={() => setModalFormVisible(true)} >
-          Creat Tasks
+          Create a Task
         </Button>
       </View>
 
@@ -191,7 +207,7 @@ const Home = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
           <View style={styles.modalView}>
             <View style={{ flexDirection: "row", alignItems: 'center' }} >
               <View style={{ flex: 1 }} >
-                <Text>New Plan / Tasks</Text>
+                <Text style={styles.modalTitle} >New Task</Text>
               </View>
               <View>
                 <Button icon="close-circle-outline" onPress={() => setModalFormVisible(!modalFormVisible)} />
@@ -200,6 +216,20 @@ const Home = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
             <View>
               <TextInput style={styles.txtInput} label="Title" value={title} onChangeText={title => setTitle(title)} />
               <TextInput style={styles.txtInput} label="Task" value={task} onChangeText={task => setTask(task)} />
+              <View style={styles.separator}></View>
+              <Text style={styles.label}>Select Dependency</Text>
+              <Dropdown
+                style={styles.dropdown}
+                label="No Dependency"
+                data={generateDropdownData(todo_list ?? [])}
+                value={selectedDependency}
+                search
+                labelField="label"
+                valueField="value"
+                placeholder="No Dependency"
+                searchPlaceholder="Search..."
+                onChange={(value) => setSelectedDependency(value)}
+              />
             </View>
 
             <Button style={{ alignSelf: "flex-end" }} icon="note-plus" onPress={handleAddTodo} >
@@ -257,6 +287,24 @@ const styles = StyleSheet.create({
     paddingTop: Constants.statusBarHeight,
     flexGrows: 1
   },
+  separator: {
+    height: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: 'lightgray',
+    marginBottom: 10
+  },
+  label: {
+    fontSize: 12,
+    marginBottom: 5,
+    color: 'tomato'
+  },
+  dropdown: {
+    height: 50,
+    borderColor: 'gray',
+    borderWidth: 0.5,
+    borderRadius: 8,
+    paddingHorizontal: 8,
+  },
   content: {
     flex: 1,
     justifyContent: "center",
@@ -290,6 +338,11 @@ const styles = StyleSheet.create({
   modalText: {
     marginBottom: 15,
     textAlign: "center"
+  },
+  modalTitle: {
+    fontSize: 15,
+    fontWeight: 'bold',
+    marginBottom: 5
   },
   txtInput: {
     width: 300,
