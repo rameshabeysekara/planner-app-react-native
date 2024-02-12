@@ -155,18 +155,18 @@ const Home = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
 
   //get task list to the dropdown
   const generateDropdownData = (todoList) => {
-    return todoList.map((todo) => {
-      return {
-        value: todo.id,
-        label: todo.title || '[ No Title ]',
-      };
-    });
-  };
+    const dropdownData = todoList.map((todo) => ({
+      label: todo.title || '[ No Title ]',
+      value: todo.id,
+    }));
 
-  console.log("Dropdown props:", {
-    data: generateDropdownData(todo_list ?? []),
-    value: selectedDependency,
-  });
+    dropdownData.unshift({
+      label: 'No Dependency',
+      value: null,
+    });
+
+    return dropdownData;
+  };
   
   return (
     <View style={styles.container}>
@@ -200,7 +200,7 @@ const Home = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
         <Button labelStyle={{ fontWeight: 'bold', color: 'white' }}
           style={{ backgroundColor: 'tomato' }}
           onPress={() => setModalFormVisible(true)} >
-          Creat Tasks
+          Create a Task
         </Button>
       </View>
 
@@ -210,7 +210,7 @@ const Home = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
           <View style={styles.modalView}>
             <View style={{ flexDirection: "row", alignItems: 'center' }} >
               <View style={{ flex: 1 }} >
-                <Text>New Plan / Tasks</Text>
+                <Text style={styles.modalTitle} >New Task</Text>
               </View>
               <View>
                 <Button icon="close-circle-outline" onPress={() => setModalFormVisible(!modalFormVisible)} />
@@ -219,14 +219,17 @@ const Home = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
             <View>
               <TextInput style={styles.txtInput} label="Title" value={title} onChangeText={title => setTitle(title)} />
               <TextInput style={styles.txtInput} label="Task" value={task} onChangeText={task => setTask(task)} />
+              <View style={styles.separator}></View>
+              <Text style={styles.label}>Select Dependency</Text>
               <Dropdown
-                label="Select Dependency"
+                style={styles.dropdown}
+                label="No Dependency"
                 data={generateDropdownData(todo_list ?? [])}
                 value={selectedDependency}
                 search
                 labelField="label"
                 valueField="value"
-                placeholder="Select item"
+                placeholder="No Dependency"
                 searchPlaceholder="Search..."
                 onChange={(value) => setSelectedDependency(value)}
               />
@@ -287,6 +290,24 @@ const styles = StyleSheet.create({
     paddingTop: Constants.statusBarHeight,
     flexGrows: 1
   },
+  separator: {
+    height: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: 'lightgray',
+    marginBottom: 10
+  },
+  label: {
+    fontSize: 12,
+    marginBottom: 5,
+    color: 'tomato'
+  },
+  dropdown: {
+    height: 50,
+    borderColor: 'gray',
+    borderWidth: 0.5,
+    borderRadius: 8,
+    paddingHorizontal: 8,
+  },
   content: {
     flex: 1,
     justifyContent: "center",
@@ -320,6 +341,11 @@ const styles = StyleSheet.create({
   modalText: {
     marginBottom: 15,
     textAlign: "center"
+  },
+  modalTitle: {
+    fontSize: 15,
+    fontWeight: 'bold',
+    marginBottom: 5
   },
   txtInput: {
     width: 300,
