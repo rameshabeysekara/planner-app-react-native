@@ -20,10 +20,6 @@ const Home = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
   const [selectedDependency, setSelectedDependency] = React.useState(null);
 
   const handleAddTodo = () => {
-    // addTodo (   title, task  )
-    // setTask (   ''  )
-    // setTitle (   ''  )
-    // setModalFormVisible (   false  )
     if (task.trim() !== '') {
       // Validation for not including title
       if (title.trim() !== '') {
@@ -32,6 +28,7 @@ const Home = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
         setTask('')
         setTitle('')
         setSelectedDependency(null)
+        setModalFormVisible(false)
 
       } else {
 
