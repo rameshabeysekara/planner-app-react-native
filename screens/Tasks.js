@@ -51,7 +51,7 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
         ])
       }
     } else {
-      Alert.alert('Alert', 'Field is empty', [
+      Alert.alert('Alert', 'Both Fields are empty', [
         {
           text: 'Cancel',
           style: 'cancel',
