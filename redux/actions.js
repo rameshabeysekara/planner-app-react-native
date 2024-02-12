@@ -17,14 +17,15 @@ let nextTodoId = 0
 
 // })
 
-export const addTodo = (title, task) => {
+export const addTodo = (title, task, dependencyId) => {
     console.log(title, task); // Move the console.log statement here
     return {
       type: ADD_TODO,
       payload: {
         id: ++nextTodoId,
         title,
-        task
+        task,
+        dependencyId
       }
     };
   };

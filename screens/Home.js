@@ -4,6 +4,7 @@ import Spacer from '../components/Spacer'
 import Constants from 'expo-constants'
 
 import { Text, View, StyleSheet, Modal, FlatList, Pressable, Alert } from "react-native"
+import { Dropdown } from 'react-native-element-dropdown';
 import { Button, TextInput, Card, Paragraph } from "react-native-paper"
 import { FontAwesome as Icon } from '@expo/vector-icons'
 import { connect } from 'react-redux'
@@ -16,6 +17,7 @@ const Home = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
   const [modalFormVisible, setModalFormVisible] = React.useState(false)
   const [title, setTitle] = React.useState('')
   const [task, setTask] = React.useState('')
+  const [selectedDependency, setSelectedDependency] = React.useState(null);
 
   const handleAddTodo = () => {
     // addTodo (   title, task  )
@@ -26,9 +28,10 @@ const Home = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
       // Validation for not including title
       if (title.trim() !== '') {
 
-        addTodo(title, task)
+        addTodo(title, task, selectedDependency);
         setTask('')
         setTitle('')
+        setSelectedDependency(null)
 
       } else {
 
@@ -44,6 +47,7 @@ const Home = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
               addTodo('', task)
               setTask('')
               setTitle('')
+              setSelectedDependency(null)
               setModalFormVisible(false)
             },
           },
@@ -149,6 +153,21 @@ const Home = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
     )
   }
 
+  //get task list to the dropdown
+  const generateDropdownData = (todoList) => {
+    return todoList.map((todo) => {
+      return {
+        value: todo.id,
+        label: todo.title || '[ No Title ]',
+      };
+    });
+  };
+
+  console.log("Dropdown props:", {
+    data: generateDropdownData(todo_list ?? []),
+    value: selectedDependency,
+  });
+  
   return (
     <View style={styles.container}>
       <View style={styles.content}>
@@ -200,6 +219,17 @@ const Home = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
             <View>
               <TextInput style={styles.txtInput} label="Title" value={title} onChangeText={title => setTitle(title)} />
               <TextInput style={styles.txtInput} label="Task" value={task} onChangeText={task => setTask(task)} />
+              <Dropdown
+                label="Select Dependency"
+                data={generateDropdownData(todo_list ?? [])}
+                value={selectedDependency}
+                search
+                labelField="label"
+                valueField="value"
+                placeholder="Select item"
+                searchPlaceholder="Search..."
+                onChange={(value) => setSelectedDependency(value)}
+              />
             </View>
 
             <Button style={{ alignSelf: "flex-end" }} icon="note-plus" onPress={handleAddTodo} >
