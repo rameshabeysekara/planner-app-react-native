@@ -3,6 +3,7 @@ import { AppRegistry } from "react-native";
 import { name as appName } from "./app.json";
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View } from "react-native";
+import { createStackNavigator } from '@react-navigation/stack';
 import {
   Button,
   MD3LightTheme as DefaultTheme,
@@ -13,13 +14,14 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createMaterialBottomTabNavigator } from "react-native-paper/react-navigation";
 import Home from "./screens/Home";
 import Settings from "./screens/Settings";
+import ActivityLog from "./screens/ActivityLog";
 import Tasks from "./screens/Tasks";
 import { Provider } from "react-redux";
 import { store, persistor } from "./redux/store";
 import { PersistGate } from "redux-persist/integration/react";
 
 const Tab = createMaterialBottomTabNavigator();
-
+const Stack = createStackNavigator();
 const theme = {
   ...DefaultTheme,
   colors: {
@@ -54,13 +56,30 @@ export default function App() {
                 }}
                 component={Tasks}
               />
+
               <Tab.Screen
                 name="Settings"
                 options={{
-                  tabBarIcon: () => <Feather name="settings" size={24} />,
+                  tabBarIcon: () => (
+                    <Feather name="settings" size={24} />
+                  ),
                 }}
-                component={Settings}
-              />
+              >
+                {() => (
+                  <Stack.Navigator>
+                    <Stack.Screen
+                      name="settings"
+                      component={Settings}
+                      options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                      name="ActivityLog"
+                      component={ActivityLog}
+                      options={{ title: 'Activity Log' }}
+                    />
+                  </Stack.Navigator>
+                )}
+              </Tab.Screen>
             </Tab.Navigator>
           </NavigationContainer>
         </PaperProvider>
@@ -68,6 +87,7 @@ export default function App() {
     </Provider>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {

@@ -23,15 +23,14 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
     if (task.trim() !== '') {
       // Validation for not including title
       if (title.trim() !== '') {
-
+        // Adding the task with title, task, and selectedDependency (ID)
         addTodo(title, task, selectedDependency);
-        setTask('')
-        setTitle('')
-        setSelectedDependency(null)
-        setModalFormVisible(false)
-
+        setTask('');
+        setTitle('');
+        setSelectedDependency(null);
+        setModalFormVisible(false);
       } else {
-
+        // If the title is empty, prompt the user
         Alert.alert('Alert', 'Do you want to add the task without a title?', [
           {
             text: 'Cancel',
@@ -41,16 +40,17 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
             text: 'OK',
             // Adding without a title
             onPress: () => {
-              addTodo('', task)
-              setTask('')
-              setTitle('')
-              setSelectedDependency(null)
-              setModalFormVisible(false)
+              addTodo('', task, selectedDependency);
+              setTask('');
+              setTitle('');
+              setSelectedDependency(null);
+              setModalFormVisible(false);
             },
           },
-        ])
+        ]);
       }
     } else {
+      // If both fields are empty, show an alert
       Alert.alert('Alert', 'Both Fields are empty', [
         {
           text: 'Cancel',
@@ -59,9 +59,9 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
         {
           text: 'OK',
         },
-      ])
+      ]);
     }
-  }
+  };
 
   // Custom Icon Component
   // Renders an icon with a label below it
@@ -90,6 +90,8 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
     setModalTask(item.task)
     // Set the modal title to the title of the selected item
     setModalTitle(item.title)
+    // Set the modal dependency to the dependency ID of the selected item
+    setSelectedDependency(item.dependencyId);
     // Set the visibility of the update modal to true, thus opening the modal
     setModalUpdateVisible(true)
   }
@@ -202,43 +204,44 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
       </View>
 
       { /* Modal form start here | Modal Template  [  Added by  : Ronald  ] */}
-      <Modal animationType="fade" transparent={true} visible={modalFormVisible} onRequestClose={() => { setModalFormVisible(!modalFormVisible) }} >
-        <View style={styles.centeredView} >
-          <View style={styles.modalView}>
-            <View style={{ flexDirection: "row", alignItems: 'center' }} >
-              <View style={{ flex: 1 }} >
-                <Text style={styles.modalTitle} >New Task</Text>
-              </View>
-              <View>
-                <Button icon="close-circle-outline" onPress={() => setModalFormVisible(!modalFormVisible)} />
-              </View>
+      <Modal animationType="fade" transparent={true} visible={modalFormVisible} onRequestClose={() => { setModalFormVisible(!modalFormVisible) }}>
+      <View style={styles.centeredView} >
+        <View style={styles.modalView}>
+          <View style={{ flexDirection: "row", alignItems: 'center' }} >
+            <View style={{ flex: 1 }} >
+              <Text style={styles.modalTitle} >New Task</Text>
             </View>
             <View>
-              <TextInput style={styles.txtInput} label="Title" value={title} onChangeText={title => setTitle(title)} />
-              <TextInput style={styles.txtInput} label="Task" value={task} onChangeText={task => setTask(task)} />
-              <View style={styles.separator}></View>
-              <Text style={styles.label}>Select Dependency</Text>
-              <Dropdown
-                style={styles.dropdown}
-                label="No Dependency"
-                data={generateDropdownData(todo_list ?? [])}
-                value={selectedDependency}
-                search
-                labelField="label"
-                valueField="value"
-                placeholder="No Dependency"
-                searchPlaceholder="Search..."
-                onChange={(value) => setSelectedDependency(value)}
-              />
+              <Button icon="close-circle-outline" onPress={() => setModalFormVisible(!modalFormVisible)} />
             </View>
-
-            <Button style={{ alignSelf: "flex-end" }} icon="note-plus" onPress={handleAddTodo} >
-              Save Task
-            </Button>
           </View>
-        </View>
 
-      </Modal>
+          <View>
+            <TextInput style={styles.txtInput} label="Title" value={title} onChangeText={title => setTitle(title)} />
+            <TextInput style={styles.txtInput} label="Task" value={task} onChangeText={task => setTask(task)} />
+            <View style={styles.separator}></View>
+            <Text style={styles.label}>Select Dependency</Text>
+            <Dropdown
+              style={styles.dropdown}
+              label="No Dependency"
+              data={generateDropdownData(todo_list ?? [])}
+              value={selectedDependency}
+              search
+              labelField="label"
+              valueField="value"
+              placeholder="No Dependency"
+              searchPlaceholder="Search..."
+              onChange={(value) => setSelectedDependency(value)}
+            />
+          </View>
+
+          <Button style={{ alignSelf: "center" }} icon="note-plus" onPress={handleAddTodo} >
+            Save Task
+          </Button>
+        </View>
+      </View>
+
+    </Modal>
 
       { /* Modal for updating tasks */}
       <Modal animationType="fade" transparent={true} visible={modalUpdateVisible} onRequestClose={() => setModalUpdateVisible(false)} >
