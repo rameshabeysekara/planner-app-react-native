@@ -19,7 +19,7 @@ export default function (state = initialState, action) {
   return {
     ...state,
     todo_list: [...state.todo_list, { id, task, title, }],
-    activityLog: [log, ...state.activityLog],
+    activityLog: [log, ...(Array.isArray(state.activityLog) ? state.activityLog : [])],
   };
 }
 
@@ -40,7 +40,7 @@ export default function (state = initialState, action) {
           }
           return todo;
         }),
-        activityLog: [log, ...state.activityLog],
+        activityLog: [log, ...(Array.isArray(state.activityLog) ? state.activityLog : [])],
       };
     }
 
@@ -57,7 +57,7 @@ export default function (state = initialState, action) {
       return {
         ...state,
         todo_list: state.todo_list.filter((todo) => todo.id !== id),
-        activityLog: [log, ...state.activityLog],
+        activityLog: [log, ...(Array.isArray(state.activityLog) ? state.activityLog : [])],
       };
     }
 
