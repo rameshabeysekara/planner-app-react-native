@@ -15,6 +15,7 @@ import rootReducer from "./reducers";
 const persistConfig = {
   key: "root",
   storage: AsyncStorage,
+  whitelist: ["todos"]
 //   whitelist: ['key1', 'key2'],//Things you want to persist
 //   blacklist: ['key3', 'key4'],//Things you don't want to persist
 };
