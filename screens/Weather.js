@@ -4,6 +4,8 @@ import { TextInput, Button, Text, Snackbar, Card } from "react-native-paper";
 
 const Weather = () => {
   const [city, setCity] = useState("");
+  const [cityName, setCityName] = useState("");
+  const [countryName, setCountryName] = useState("");
   const [forecastData, setForecastData] = useState([]);
   const [error, setError] = useState(null);
 
@@ -22,6 +24,8 @@ const Weather = () => {
         return;
       }
       const data = await response.json();
+      setCityName(data.location.name); 
+      setCountryName(data.location.country); 
       setForecastData(data.forecast.forecastday);
     } catch (error) {
       setError("Error fetching weather data. Please try again later.");
@@ -47,6 +51,7 @@ const Weather = () => {
             <Card key={index} style={styles.card}>
               <Card.Content>
                 <Text style={styles.date}>{day.date}</Text>
+                <Text style={styles.location}>{cityName}, {countryName}</Text>
                 <Text>{day.day.condition.text}</Text>
                 <Text>Max Temp: {day.day.maxtemp_c}°C</Text>
                 <Text>Min Temp: {day.day.mintemp_c}°C</Text>
@@ -101,6 +106,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     marginBottom: 10,
+  },
+  location: {
+    fontSize: 14,
+    fontWeight: "bold",
+    marginBottom: 5,
   },
 });
 
