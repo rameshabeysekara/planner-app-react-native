@@ -42,7 +42,7 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
           {
             text: 'OK',
             onPress: () => {
-              addTodo('', task, selectedDependency,)
+              addTodo('', task, selectedDependency)
               setTask('')
               setTitle('')
               setSelectedDependency(null)
@@ -61,7 +61,7 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
         {
           text: 'OK',
           onPress: () => {
-            addTodo('', task, selectedDependency,)
+            addTodo('', task, selectedDependency)
             setTask('')
             setTitle('')
             setSelectedDependency(null)
@@ -92,7 +92,7 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
           text: 'Yes',
           onPress: () => {
             // If the user chooses to proceed without a title, update the plan/task with an empty title and the provided task
-            updateTodo(id, '', modalTask, selectedDependency,)
+            updateTodo(id, '', modalTask, selectedDependency)
             // Hide the update modal
             setModalUpdateVisible(false)
           },
@@ -213,7 +213,7 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
               const iconColor = status === 'Done' ? 'green' : 'gray'
               const dependentOn = (<Paragraph style={{ marginTop: 10, color: 'gray', fontSize: 12 }}>
                 {/* To Do = Imasha */}
-                Dependent on: [ No Dependencies ]
+                Dependent on: { item.dependentTaskId != null ? item.dependentTaskId.label : "[ No Dependency ]"}
               </Paragraph>
               )
 

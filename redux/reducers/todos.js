@@ -6,19 +6,21 @@ const initialState = {
 };
 
 export default function (state = initialState, action) {
+  console.log(action.payload)
   switch (action.type) {
     case ADD_TODO: {
-  const { id, task, title, } = action.payload;
+  const { id, task, title, dependentTaskId } = action.payload;
   const log = {
     type: "Added Task",
     id,
     title,
     task,
+    dependentTaskId
   };
 
   return {
     ...state,
-    todo_list: [...state.todo_list, { id, task, title, }],
+    todo_list: [...state.todo_list, { id, task, title, dependentTaskId }],
     activityLog: [log, ...(Array.isArray(state.activityLog) ? state.activityLog : [])],
   };
 }
