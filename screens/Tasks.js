@@ -77,7 +77,7 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
     // Check if the title is not empty
     if (modalTitle.trim() !== '') {
       // If title is not empty, update the plan/task with the provided ID, title, and task
-      updateTodo(id, modalTitle, modalTask)
+      updateTodo(id, modalTitle, modalTask, selectedDependency)
       // Hide the update modal
       setModalUpdateVisible(false)
     } else {

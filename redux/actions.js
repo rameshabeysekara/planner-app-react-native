@@ -9,9 +9,9 @@ export const addTodo = (title, task, dependentTaskId) => {
   };
 };
 
-export const updateTodo = (id, title, task,) => ({
+export const updateTodo = (id, title, task, dependentTaskId) => ({
   type: UPDATE_TODO,
-  payload: { id, title, task, },
+  payload: { id, title, task, dependentTaskId },
 });
 
 export const deleteTodo = (id) => ({
