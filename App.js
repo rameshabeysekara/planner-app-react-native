@@ -9,13 +9,19 @@ import {
   MD3LightTheme as DefaultTheme,
   PaperProvider,
 } from "react-native-paper";
-import { FontAwesome, Feather, AntDesign } from "@expo/vector-icons";
+import {
+  FontAwesome,
+  Feather,
+  AntDesign,
+  FontAwesome5,
+} from "@expo/vector-icons";
 import { NavigationContainer } from "@react-navigation/native";
 import { createMaterialBottomTabNavigator } from "react-native-paper/react-navigation";
 import Home from "./screens/Home";
 import Settings from "./screens/Settings";
 import ActivityLog from "./screens/ActivityLog";
 import Tasks from "./screens/Tasks";
+import Weather from "./screens/Weather";
 import { Provider } from "react-redux";
 import { store, persistor } from "./redux/store";
 import { PersistGate } from "redux-persist/integration/react";
@@ -57,6 +63,19 @@ export default function App() {
                 component={Tasks}
               />
 
+              <Tab.Screen
+                name="Weather"
+                options={{
+                  tabBarIcon: () => (
+                    <FontAwesome5
+                      name="cloud-sun-rain"
+                      size={24}
+                      color="black"
+                    />
+                  ),
+                }}
+                component={Weather}
+              />
               <Tab.Screen
                 name="Settings"
                 options={{
