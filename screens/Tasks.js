@@ -198,6 +198,7 @@ const handleAddTodo = () => {
               </Paragraph>
             );
 
+
             return (
               <>
                 <Pressable key={item.id} onPress={() => openModal(item)}>
@@ -210,6 +211,10 @@ const handleAddTodo = () => {
                     <Card.Content>
                       <Paragraph>{item.task}</Paragraph>
                       {dependentOn}
+                      <Paragraph style={{ marginTop: 10, color: 'tomato', fontSize: 12 }}>
+                        Tap to edit {' '}
+                      <Icon name="pencil" size={12} color="tomato"/>
+                      </Paragraph>  
                     </Card.Content>
                   </Card>
                 </Pressable>
