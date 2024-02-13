@@ -8,25 +8,23 @@ const initialState = {
 export default function (state = initialState, action) {
   switch (action.type) {
     case ADD_TODO: {
-      const { id, task, title } = action.payload;
-      const log = {
-        type: "Added Task",
-        id,
-        title,
-        task,
-        dependencyId: action.payload.dependencyId,
-        dependencyName: action.payload.dependencyName || "None",
-      };
+  const { id, task, title, } = action.payload;
+  const log = {
+    type: "Added Task",
+    id,
+    title,
+    task,
+  };
 
-      return {
-        ...state,
-        todo_list: [...state.todo_list, { id, task, title }],
-        activityLog: [log, ...state.activityLog],
-      };
-    }
+  return {
+    ...state,
+    todo_list: [...state.todo_list, { id, task, title, }],
+    activityLog: [log, ...state.activityLog],
+  };
+}
 
     case UPDATE_TODO: {
-      const { id, task, title } = action.payload;
+      const { id, task, title,} = action.payload;
       const log = {
         type: "Updated Task",
         id,
@@ -38,7 +36,7 @@ export default function (state = initialState, action) {
         ...state,
         todo_list: state.todo_list.map((todo) => {
           if (todo.id === id) {
-            return { ...todo, task, title };
+            return { ...todo, task, title, };
           }
           return todo;
         }),
@@ -54,8 +52,6 @@ export default function (state = initialState, action) {
         id,
         title: deletedTodo.title,
         task: deletedTodo.task,
-        dependencyId: action.payload.dependencyId,
-        dependencyName: action.payload.dependencyName || "None",
       };
 
       return {
@@ -74,8 +70,6 @@ export default function (state = initialState, action) {
             id: action.payload.id,
             title: action.payload.title,
             task: action.payload.task,
-            dependencyId: action.payload.dependencyId,
-            dependencyName: action.payload.dependencyName,
           },
           ...state.activityLog,
         ],

@@ -1,5 +1,6 @@
 import React from 'react';
-import { Text, View, TouchableOpacity } from 'react-native';
+import { Text, View, SafeAreaView, TouchableOpacity } from 'react-native';
+import { ListItem } from 'react-native-elements';
 import { withNavigation } from 'react-navigation';
 
 const Settings = ({ navigation }) => {
@@ -7,13 +8,34 @@ const Settings = ({ navigation }) => {
     navigation.navigate('ActivityLog');
   };
 
+  const navigateToOtherScreen = () => {
+   
+  };
+
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text>Settings Page</Text>
-      <TouchableOpacity onPress={navigateToActivityLog}>
-        <Text style={{ color: 'blue', marginTop: 10 }}>Go to Activity Log</Text>
-      </TouchableOpacity>
-    </View>
+    <SafeAreaView style={{ flex: 1 }}>
+      <View style={{ paddingHorizontal: 20, paddingTop: 20 }}>
+
+        <TouchableOpacity onPress={navigateToActivityLog}>
+          <ListItem bottomDivider containerStyle={{ marginTop: 5 }}>
+            <ListItem.Content>
+              <ListItem.Title>Activity Log</ListItem.Title>
+            </ListItem.Content>
+          </ListItem>
+        </TouchableOpacity>
+
+        {/* for other screens */}
+        <TouchableOpacity onPress={navigateToOtherScreen}>
+          <ListItem bottomDivider containerStyle={{ marginTop: 5 }}>
+            <ListItem.Content>
+              <ListItem.Title>Notifications</ListItem.Title>
+            </ListItem.Content>
+          </ListItem>
+        </TouchableOpacity>
+
+        {/* Add more items as needed */}
+      </View>
+    </SafeAreaView>
   );
 };
 
