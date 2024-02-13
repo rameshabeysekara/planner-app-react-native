@@ -19,11 +19,6 @@ const ActivityLog = ({ activityLog }) => {
   );
 };
 
-const mapStateToProps = (state) => {
-  return {
-    activityLog: state.todos.activityLog,
-  };
-};
 
 const getTaskTypeColor = (type) => {
   switch (type) {
@@ -39,5 +34,10 @@ const getTaskTypeColor = (type) => {
 };
 
 
+const mapStateToProps = (state) => {
+  return {
+    activityLog: state.todos.activityLog || [],
+  };
+};
 
 export default connect(mapStateToProps)(ActivityLog);
