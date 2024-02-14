@@ -316,7 +316,7 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
                 </Pressable>
               </View>
             </View>
-
+            <View>
             <View>
               <TextInput
                 style={styles.txtInput}
@@ -330,20 +330,29 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
                 value={modalEditMode ? modalTask : task}
                 onChangeText={(text) => modalEditMode ? setModalTask(text) : setTask(text)}
               />
-              <View style={styles.separator}></View>
-              <Text style={styles.label}>Select Dependency</Text>
-              <Dropdown
-                style={styles.dropdown}
-                label="No Dependency"
-                data={generateDropdownData(todo_list ?? [])}
-                value={selectedDependency}
-                search
-                labelField="label"
-                valueField="value"
-                placeholder="No Dependency"
-                searchPlaceholder="Search..."
-                onChange={(value) => setSelectedDependency(value)} />
+              
             </View>
+            {!modalEditMode && (
+              <View>
+                <View style={styles.separator}></View>
+                <Text style={styles.label}>Select Dependency</Text>
+                <Dropdown
+                  style={styles.dropdown}
+                  label="No Dependency"
+                  data={generateDropdownData(todo_list ?? [])}
+                  value={selectedDependency}
+                  search
+                  labelField="label"
+                  valueField="value"
+                  placeholder="No Dependency"
+                  searchPlaceholder="Search..."
+                  onChange={(value) => setSelectedDependency(value)}
+                />
+              </View>
+            )}
+
+            </View>
+
             <View style={styles.separator}></View>
             <View style={{ flexDirection: 'row', }}>
               {modalEditMode && (
