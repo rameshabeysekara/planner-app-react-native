@@ -157,16 +157,45 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
   const [statusMap, setStatusMap] = React.useState({});
   const taskStat = ( id, stat ) => {
 
+    const currentTask = todo_list.find(task => task.id === id);
+
     if ( stat === 'Done') {
-      
-      setStatusMap( ( prevStatusMap ) => ({
 
-        ...prevStatusMap,
-        [ id ] : stat,
+      if(dependentTask != null) {
 
-      }))
-
-      setModalUpdateVisible( false )
+        if(dependentTask.value != null) {
+          if (statusMap.hasOwnProperty(dependentTask.value.toString())) {
+            //if there is a dependency and status == done
+            setStatusMap(prevStatusMap => ({
+              ...prevStatusMap,
+              [id]: stat,
+            }));
+            setModalUpdateVisible(false);
+          } else {
+            //if there is a dependency and status != done
+            Alert.alert('Alert', 'Dependent task must be completed first.', [
+              {
+                text: 'OK',
+              },
+            ]);
+          }
+        } else {
+          //if there is no dependency
+          setStatusMap(prevStatusMap => ({
+            ...prevStatusMap,
+            [id]: stat,
+          }));
+          setModalUpdateVisible(false);
+        }
+        
+      } else {
+        //if there is no dependency
+        setStatusMap(prevStatusMap => ({
+          ...prevStatusMap,
+          [id]: stat,
+        }));
+        setModalUpdateVisible(false);
+      }
       
     } else {
 
