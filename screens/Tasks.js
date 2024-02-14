@@ -242,7 +242,7 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
               const iconColor = status === 'Done' ? 'green' : 'gray'
               const dependentOn = (<Paragraph style={{ marginTop: 10, color: 'gray', fontSize: 12 }}>
                 {/* To Do = Imasha */}
-                Dependent on: { item.dependentTaskId != null ? item.dependentTaskId.label : "[ No Dependency ]"}
+                Dependent on: { item.dependentTaskId != null ? item.dependentTaskId.label : "None"}
               </Paragraph>
               )
 
