@@ -160,7 +160,7 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
     const currentTask = todo_list.find(task => task.id === id);
 
     if ( stat === 'Done') {
-
+      const dependentTask = currentTask.dependentTaskId;
       if(dependentTask != null) {
 
         if(dependentTask.value != null) {
@@ -173,7 +173,7 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
             setModalUpdateVisible(false);
           } else {
             //if there is a dependency and status != done
-            Alert.alert('Alert', 'Dependent task must be completed first.', [
+            Alert.alert('Alert', 'The primary task must be completed first.', [
               {
                 text: 'OK',
               },
