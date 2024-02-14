@@ -8,39 +8,41 @@ const initialState = {
 export default function (state = initialState, action) {
   switch (action.type) {
     case ADD_TODO: {
-  const { id, task, title, } = action.payload;
+  const { id, task, title, dependentTaskId } = action.payload;
   const log = {
     type: "Added Task",
     id,
     title,
     task,
+    dependentTaskId
   };
 
   return {
     ...state,
-    todo_list: [...state.todo_list, { id, task, title, }],
-    activityLog: [log, ...state.activityLog],
+    todo_list: [...state.todo_list, { id, task, title, dependentTaskId }],
+    activityLog: [log, ...(Array.isArray(state.activityLog) ? state.activityLog : [])],
   };
 }
 
     case UPDATE_TODO: {
-      const { id, task, title,} = action.payload;
+      const { id, task, title, dependentTaskId} = action.payload;
       const log = {
         type: "Updated Task",
         id,
         title,
         task,
+        dependentTaskId
       };
 
       return {
         ...state,
         todo_list: state.todo_list.map((todo) => {
           if (todo.id === id) {
-            return { ...todo, task, title, };
+            return { ...todo, task, title, dependentTaskId };
           }
           return todo;
         }),
-        activityLog: [log, ...state.activityLog],
+        activityLog: [log, ...(Array.isArray(state.activityLog) ? state.activityLog : [])],
       };
     }
 
@@ -57,7 +59,7 @@ export default function (state = initialState, action) {
       return {
         ...state,
         todo_list: state.todo_list.filter((todo) => todo.id !== id),
-        activityLog: [log, ...state.activityLog],
+        activityLog: [log, ...(Array.isArray(state.activityLog) ? state.activityLog : [])],
       };
     }
 

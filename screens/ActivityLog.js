@@ -21,7 +21,7 @@ const ActivityLog = ({ activityLog }) => {
 
 const mapStateToProps = (state) => {
   return {
-    activityLog: state.todos.activityLog,
+    activityLog: state.todos.activityLog || [],
   };
 };
 
