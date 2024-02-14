@@ -154,13 +154,13 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
     )
   }
 
-  const [statusMap, setStatusMap] = React.useState({});
+  const [statusMap, setStatusMap] = React.useState({})
   const taskStat = ( id, stat ) => {
 
-    const currentTask = todo_list.find(task => task.id === id);
+    const currentTask = todo_list.find(task => task.id === id)
 
     if ( stat === 'Done') {
-      const dependentTask = currentTask.dependentTaskId;
+      const dependentTask = currentTask.dependentTaskId
       if(dependentTask != null) {
 
         if(dependentTask.value != null) {
@@ -169,23 +169,23 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
             setStatusMap(prevStatusMap => ({
               ...prevStatusMap,
               [id]: stat,
-            }));
-            setModalUpdateVisible(false);
+            }))
+            setModalUpdateVisible(false)
           } else {
             //if there is a dependency and status != done
             Alert.alert('Alert', 'The primary task must be completed first.', [
               {
                 text: 'OK',
               },
-            ]);
+            ])
           }
         } else {
           //if there is no dependency
           setStatusMap(prevStatusMap => ({
             ...prevStatusMap,
             [id]: stat,
-          }));
-          setModalUpdateVisible(false);
+          }))
+          setModalUpdateVisible(false)
         }
         
       } else {
@@ -193,8 +193,8 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
         setStatusMap(prevStatusMap => ({
           ...prevStatusMap,
           [id]: stat,
-        }));
-        setModalUpdateVisible(false);
+        }))
+        setModalUpdateVisible(false)
       }
       
     } else {
@@ -235,7 +235,7 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
             data={todo_list}
             keyExtractor={(item) => item.id}
             renderItem={({ item, index }) => {
-              const status = statusMap[item.id] || 'On going';
+              const status = statusMap[item.id] || 'On going'
               const cardTitle = (<Text style={{ color: 'black', fontWeight: 'bold', fontSize: 22 }}> {item.title || '[ No Title ]'}</Text>)
               const cardSubTitleColor = status === 'Done' ? 'green' : 'gray'
               const cardSubTitle = (<Text style={{ color: cardSubTitleColor, fontSize: 15 }} > Status : {status}</Text>)
