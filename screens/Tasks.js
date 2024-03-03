@@ -246,6 +246,15 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
               </Paragraph>
               )
 
+              const pointsLabel = (
+                <View style={styles.pointsContainer}>
+                  <View style={styles.pointsCard}>
+                    <Icon name="trophy" size={20} color="tomato" style={{ padding: 3 }} />
+                    <Text style={styles.pointsText}>{item.points || 0}</Text>
+                  </View>
+                </View>
+              );
+
               return (
                 <>
                   <Pressable key={item.id} onPress={() => openModal(item)}>
@@ -265,6 +274,10 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
                           <Icon name="pencil" size={12} color="tomato" />
                         </Paragraph>
                       </Card.Content>
+                      {/* display points */}
+                      <Card.Actions style={{ justifyContent: 'flex-end', paddingRight: 10, paddingBottom: 10 }}>
+                        {pointsLabel}
+                      </Card.Actions>
                     </Card>
                   </Pressable>
                 </>
@@ -454,7 +467,35 @@ const styles = StyleSheet.create({
   txtInput: {
     width: 300,
     margin: 5
-  }
+  },
+  pointsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingBottom: 5
+  },
+  
+  pointsCard: {
+    flexDirection: 'row',
+    backgroundColor: 'white',
+    borderRadius: 15,
+    padding: 4,
+    marginRight: 5,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  
+  pointsText: {
+    color: 'black',
+    padding: 4,
+    fontWeight: 'bold',
+  },
+  
 
 })
 
