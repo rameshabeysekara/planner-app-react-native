@@ -8,18 +8,19 @@ const initialState = {
 export default function (state = initialState, action) {
   switch (action.type) {
     case ADD_TODO: {
-  const { id, task, title, dependentTaskId } = action.payload;
+  const { id, task, title, iteration, dependentTaskId } = action.payload;
   const log = {
     type: "Added Task",
     id,
     title,
     task,
+    iteration,
     dependentTaskId
   };
 
   return {
     ...state,
-    todo_list: [...state.todo_list, { id, task, title, dependentTaskId }],
+    todo_list: [...state.todo_list, { id, task, title, iteration, dependentTaskId }],
     activityLog: [log, ...(Array.isArray(state.activityLog) ? state.activityLog : [])],
   };
 }
