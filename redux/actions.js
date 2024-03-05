@@ -1,11 +1,15 @@
-import { ADD_TODO, DELETE_TODO, UPDATE_TODO, ADD_TO_ACTIVITY_LOG } from "./actionTypes";
-
-let nextTodoId = 0;
+import {
+  ADD_TODO,
+  DELETE_TODO,
+  UPDATE_TODO,
+  ADD_TO_ACTIVITY_LOG,
+} from "./actionTypes";
+import uuid from "react-native-uuid";
 
 export const addTodo = (title, task, iteration, dependentTaskId) => {
   return {
     type: ADD_TODO,
-    payload: { id: ++nextTodoId, title, task, iteration, dependentTaskId },
+    payload: { id: uuid.v4(), title, task, iteration, dependentTaskId },
   };
 };
 
