@@ -548,7 +548,35 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 30,
-  }
+  },
+
+  pointsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingBottom: 5
+  },
+  
+  pointsCard: {
+    flexDirection: 'row',
+    backgroundColor: 'white',
+    borderRadius: 15,
+    padding: 4,
+    marginRight: 5,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  
+  pointsText: {
+    color: 'black',
+    padding: 4,
+    fontWeight: 'bold',
+  },
 
 
 })
