@@ -9,7 +9,7 @@ const initialState = {
 export default function (state = initialState, action) {
   switch (action.type) {
     case ADD_TODO: {
-  const { id, task, title, iteration, dependentTaskId } = action.payload;
+  const { id, task, title, iteration, dependentTaskId, category } = action.payload;
   const points = 10;
   const log = {
     type: "Added Task",
@@ -18,12 +18,13 @@ export default function (state = initialState, action) {
     task,
     iteration,
     dependentTaskId,
+    category,
     points
   };
 
   return {
     ...state,
-    todo_list: [...state.todo_list, { id, task, title, iteration, dependentTaskId, points }],
+    todo_list: [...state.todo_list, { id, task, title, iteration, dependentTaskId, category, points }],
     activityLog: [log, ...(Array.isArray(state.activityLog) ? state.activityLog : [])]
   };
 }

@@ -32,16 +32,19 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
   const [filterModalVisible, setFilterModalVisible] = React.useState(false);
   const [filterType, setSelectedFilterType] = React.useState("On going");
   const [filteredTasks, setFilteredTasks] = React.useState([]);
+  const [selectedCategory, setSelectedCategory] = React.useState("");
 
   const handleAddTodo = () => {
     if (task.trim() !== "") {
       if (title.trim() !== "") {
-        addTodo(title, task, selectedIteration, selectedDependency);
+        addTodo(title, task, selectedIteration, selectedDependency, selectedCategory);
         setTask("");
         setTitle("");
         setSelectedIteration(null);
         setSelectedDependency(null);
         setModalFormVisible(false);
+        setSelectedCategory("")
+        console.log("Selected Category:", selectedCategory.value);
       } else {
         // If the title is empty, prompt the user
         Alert.alert("Alert", "Do you want to add the task without a title?", [
@@ -52,7 +55,7 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
           {
             text: "OK",
             onPress: () => {
-              addTodo("", task, selectedIteration, selectedDependency);
+              addTodo("", task, selectedIteration, selectedDependency, selectedCategory);
               setTask("");
               setTitle("");
               setSelectedIteration(null);
@@ -72,7 +75,7 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
         {
           text: "OK",
           onPress: () => {
-            addTodo("", task, selectedIteration, selectedDependency);
+            addTodo("", task, selectedIteration, selectedDependency, selectedCategory);
             setTask("");
             setTitle("");
             setSelectedDependency(null);
@@ -152,18 +155,67 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
     return dropdownData;
   };
 
+  const generateCategoryDropdownData = () => {
+  return [
+    { label: 'Work', value: 'Work' },
+    { label: 'Personal', value: 'Personal' },
+    { label: 'School', value: 'School' },
+    { label: 'Fitness', value: 'Fitness' },
+    { label: 'Health', value: 'Health' },
+    { label: 'Family', value: 'Family' },
+    { label: 'Finance', value: 'Finance' },
+    { label: 'Home', value: 'Home' },
+    { label: 'Hobbies', value: 'Hobbies' },
+    { label: 'Travel', value: 'Travel' },
+    { label: 'Entertainment', value: 'Entertainment' },
+  ];
+};
+
+  // Function to get the corresponding icon based on the selected category
+ const getIconForCategory = (category) => {
+  const categoryValue = category?.value || '';
+  console.log('Category:', category);
+  console.log('Category Value:', categoryValue);
+  switch (categoryValue) {
+    case 'Work':
+      return 'building-o';
+    case 'Personal':
+      return 'user';
+    case 'School':
+      return 'graduation-cap';
+    case 'Fitness':
+      return 'dumbbell';
+    case 'Health':
+      return 'heartbeat';
+    case 'Family':
+      return 'users';
+    case 'Finance':
+      return 'dollar';
+    case 'Home':
+      return 'home';
+    case 'Hobbies':
+      return 'paint-brush';
+    case 'Travel':
+      return 'plane';
+    case 'Entertainment':
+      return 'film';
+    default:
+      return 'sticky-note';
+  }
+};
+
+
   // Custom Icon Component
-  const CustomIcon = ({ name, size, color, label }) => {
-    return (
-      // View containing the icon and its label
-      <View style={{ flexDirection: "column", alignItems: "center" }}>
-        {/* Icon component with specified name, size, and color */}
-        <Icon name={name} size={size} color={color} />
-        {/* Text label displayed below the icon */}
-        <Text style={{ marginLeft: 2 }}>{label}</Text>
-      </View>
-    );
-  };
+const CustomIcon = ({ category, size, color }) => {
+  const iconName = getIconForCategory(category);
+
+  return (
+    <View style={{ flexDirection: "column", alignItems: "center" }}>
+      <Icon name={iconName} size={size} color={color} />
+    </View>
+  );
+};
+
 
   const [statusMap, setStatusMap] = React.useState({});
 
@@ -236,7 +288,7 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
     setModalEditMode(true);
   };
 
-  // Funtcio for Selected Iterations
+  // Function for Selected Iterations
   const handlePress = (option) => {
     setSelectedIteration(option);
     console.log("User selected iteration : ", option);
@@ -267,7 +319,7 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
               const status = statusMap[item.id] || "On going";
               const cardTitle = (
                 <Text
-                  style={{ color: "black", fontWeight: "bold", fontSize: 22 }}
+                  style={{ color: "black", fontWeight: "bold", fontSize: 20, }}
                 >
                   {" "}
                   {item.title || "[ No Title ]"}
@@ -321,10 +373,10 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
                         subtitle={<>{cardSubTitle}</>}
                         left={(props) => (
                           <CustomIcon
-                            name="sticky-note"
-                            size={50}
-                            color={iconColor}
-                          />
+                          category={item.category} 
+                          size={40}
+                          color={iconColor}
+                        />
                         )}
                         right={(props) => (
                           <ButtonIcon
@@ -340,8 +392,9 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
                         </Paragraph>
                         <View
                           style={{
-                            flexDirection: "row",
-                            justifyContent: "space-between",
+                            flexDirection: "column",
+                            justifyContent: "start",
+                            gap: -5
                           }}
                         >
                           <View>{dependentOn}</View>
@@ -358,10 +411,10 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
                           </View>
                         </View>
                         {/* {dependentOn} */}
-                        <Paragraph style={{ color: "gray", fontSize: 12 }}>
+                        <Text style={{ position: "absolute", bottom: -35, left: 15, color: "gray", fontSize: 12 }}>
                           Tap to edit{" "}
                           <Icon name="pencil" size={12} color="gray" />
-                        </Paragraph>
+                        </Text>
                       </Card.Content>
                       {/* display points */}
                       <Card.Actions
@@ -589,6 +642,21 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
                     </Pressable>
                   </View>
                   <View style={styles.separator}></View>
+                  <Text style={styles.label}>Select Category</Text>
+                  <Dropdown
+                    style={styles.dropdown}
+                    label="Task Category"
+                    data={generateCategoryDropdownData()}
+                    value={selectedCategory}
+                    search
+                    labelField="label"
+                    valueField="value"
+                    placeholder="Task Category"
+                    searchPlaceholder="Search..."
+                    onChange={(value) => setSelectedCategory(value)}
+                  />
+
+                  <View style={styles.separator}></View>
                   <Text style={styles.label}>Select Dependency</Text>
                   <Dropdown
                     style={styles.dropdown}
@@ -649,7 +717,7 @@ const styles = StyleSheet.create({
   flatList: {
     // paddingTop: Constants.statusBarHeight,
     marginTop: Constants.statusBarHeight,
-    flexGrows: 1,
+    flexGrow: 1,
     paddingBottom: Constants.statusBarHeight,
   },
   separator: {
