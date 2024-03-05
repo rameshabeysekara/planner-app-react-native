@@ -1,8 +1,8 @@
-import React from "react";
-import ButtonIcon from "../components/ButtonIcon";
-import Spacer from "../components/Spacer";
-import Constants from "expo-constants";
-import _ from "lodash";
+import React from "react"
+import ButtonIcon from "../components/ButtonIcon"
+import Spacer from "../components/Spacer"
+import Constants from "expo-constants"
+import _ from "lodash"
 import {
   Text,
   View,
@@ -11,37 +11,40 @@ import {
   FlatList,
   Pressable,
   Alert,
-} from "react-native";
-import { Dropdown } from "react-native-element-dropdown";
-import { Button, TextInput, Card, Paragraph } from "react-native-paper";
-import { FontAwesome as Icon } from "@expo/vector-icons";
-import { connect } from "react-redux";
-import { addTodo, deleteTodo, updateTodo } from "../redux/actions";
+} from "react-native"
+import { Dropdown } from "react-native-element-dropdown"
+import { Button, TextInput, Card, Paragraph } from "react-native-paper"
+import { FontAwesome as Icon } from "@expo/vector-icons"
+import { connect } from "react-redux"
+import { addTodo, deleteTodo, updateTodo } from "../redux/actions"
+
+import AsyncStorage from "@react-native-async-storage/async-storage"
+
 
 const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
-  const [modalFormVisible, setModalFormVisible] = React.useState(false);
-  const [title, setTitle] = React.useState("");
-  const [task, setTask] = React.useState("");
-  const [selectedDependency, setSelectedDependency] = React.useState(null);
-  const [modalEditMode, setModalEditMode] = React.useState(false);
-  const [selectedItem, setSelectedItem] = React.useState(null);
-  const [modalTask, setModalTask] = React.useState("");
-  const [modalTitle, setModalTitle] = React.useState("");
-  const [modalUpdateVisible, setModalUpdateVisible] = React.useState(false);
-  const [selectedIteration, setSelectedIteration] = React.useState(null);
-  const [filterModalVisible, setFilterModalVisible] = React.useState(false);
-  const [filterType, setSelectedFilterType] = React.useState("On going");
-  const [filteredTasks, setFilteredTasks] = React.useState([]);
+  const [modalFormVisible, setModalFormVisible] = React.useState(false)
+  const [title, setTitle] = React.useState("")
+  const [task, setTask] = React.useState("")
+  const [selectedDependency, setSelectedDependency] = React.useState(null)
+  const [modalEditMode, setModalEditMode] = React.useState(false)
+  const [selectedItem, setSelectedItem] = React.useState(null)
+  const [modalTask, setModalTask] = React.useState("")
+  const [modalTitle, setModalTitle] = React.useState("")
+  const [modalUpdateVisible, setModalUpdateVisible] = React.useState(false)
+  const [selectedIteration, setSelectedIteration] = React.useState(null)
+  const [filterModalVisible, setFilterModalVisible] = React.useState(false)
+  const [filterType, setSelectedFilterType] = React.useState("On going")
+  const [filteredTasks, setFilteredTasks] = React.useState([])
 
   const handleAddTodo = () => {
     if (task.trim() !== "") {
       if (title.trim() !== "") {
-        addTodo(title, task, selectedIteration, selectedDependency);
-        setTask("");
-        setTitle("");
-        setSelectedIteration(null);
-        setSelectedDependency(null);
-        setModalFormVisible(false);
+        addTodo(title, task, selectedIteration, selectedDependency)
+        setTask("")
+        setTitle("")
+        setSelectedIteration(null)
+        setSelectedDependency(null)
+        setModalFormVisible(false)
       } else {
         // If the title is empty, prompt the user
         Alert.alert("Alert", "Do you want to add the task without a title?", [
@@ -52,15 +55,15 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
           {
             text: "OK",
             onPress: () => {
-              addTodo("", task, selectedIteration, selectedDependency);
-              setTask("");
-              setTitle("");
-              setSelectedIteration(null);
-              setSelectedDependency(null);
-              setModalFormVisible(false);
+              addTodo("", task, selectedIteration, selectedDependency)
+              setTask("")
+              setTitle("")
+              setSelectedIteration(null)
+              setSelectedDependency(null)
+              setModalFormVisible(false)
             },
           },
-        ]);
+        ])
       }
     } else {
       // If both fields are empty, show an alert
@@ -72,25 +75,25 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
         {
           text: "OK",
           onPress: () => {
-            addTodo("", task, selectedIteration, selectedDependency);
-            setTask("");
-            setTitle("");
-            setSelectedDependency(null);
-            setModalFormVisible(false);
+            addTodo("", task, selectedIteration, selectedDependency)
+            setTask("")
+            setTitle("")
+            setSelectedDependency(null)
+            setModalFormVisible(false)
           },
         },
-      ]);
+      ])
     }
-  };
+  }
 
   // Function to handle updating a plan/task by its ID
   const handleupdateTodo = (id) => {
     // Check if the title is not empty
     if (modalTitle.trim() !== "") {
       // If title is not empty, update the plan/task with the provided ID, title, and task
-      updateTodo(id, modalTitle, modalTask, selectedDependency);
+      updateTodo(id, modalTitle, modalTask, selectedDependency)
       // Hide the update modal
-      setModalUpdateVisible(false);
+      setModalUpdateVisible(false)
     } else {
       // If title is empty, prompt the user with an alert
       Alert.alert("Alert", "Do you want to update without a title?", [
@@ -103,14 +106,14 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
           text: "Yes",
           onPress: () => {
             // If the user chooses to proceed without a title, update the plan/task with an empty title and the provided task
-            updateTodo(id, "", modalTask, selectedDependency);
+            updateTodo(id, "", modalTask, selectedDependency)
             // Hide the update modal
-            setModalUpdateVisible(false);
+            setModalUpdateVisible(false)
           },
         },
-      ]);
+      ])
     }
-  };
+  }
 
   // Function to handle the deletion of a plan/task by its ID
   // Dispatch action to delete the plan/task with the given ID
@@ -130,27 +133,27 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
           style: "destructive",
           onPress: () => {
             // If user confirms deletion, call deleteTodo function
-            deleteTodo(id);
-            console.log("Task deleted successfully");
+            deleteTodo(id)
+            console.log("Task deleted successfully")
           },
         },
       ]
-    );
-  };
+    )
+  }
 
   //get task list to the dropdown
   const generateDropdownData = (todoList) => {
     const dropdownData = todoList.map((todo) => ({
       label: todo.title || "[ No Title ]",
       value: todo.id,
-    }));
+    }))
 
     dropdownData.unshift({
       label: "No Dependency",
       value: null,
-    });
-    return dropdownData;
-  };
+    })
+    return dropdownData
+  }
 
   // Custom Icon Component
   const CustomIcon = ({ name, size, color, label }) => {
@@ -162,98 +165,117 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
         {/* Text label displayed below the icon */}
         <Text style={{ marginLeft: 2 }}>{label}</Text>
       </View>
-    );
-  };
+    )
+  }
 
-  const [statusMap, setStatusMap] = React.useState({});
-
-  const taskStat = (id, stat) => {
-    const currentTask = todo_list.find((task) => task.id === id);
-
-    if (stat === "Done") {
-      const dependentTask = currentTask.dependentTaskId;
-      if (dependentTask != null) {
-        if (dependentTask.value != null) {
-          if (statusMap.hasOwnProperty(dependentTask.value.toString())) {
-            // Create a new object reference with updated statusMap
-            const updatedStatusMap = {
-              ...statusMap,
-              [id]: stat,
-            };
-            // Update the statusMap state
-            setStatusMap(updatedStatusMap);
-            setModalUpdateVisible(false);
-          } else {
-            //if there is a dependency and status != done
-            Alert.alert("Alert", "The primary task must be completed first.", [
-              {
-                text: "OK",
-              },
-            ]);
-          }
-        } else {
-          //if there is no dependency
-          const updatedStatusMap = {
-            ...statusMap,
-            [id]: stat,
-          };
-          setStatusMap(updatedStatusMap);
-          setModalUpdateVisible(false);
+  React.useEffect(() => {
+    const loadStatusMap = async () => {
+      try {
+        const statusMapString = await AsyncStorage.getItem("statusMap")
+        if (statusMapString !== null) {
+          setStatusMap(JSON.parse(statusMapString))
         }
-      } else {
-        //if there is no dependency
-        const updatedStatusMap = {
+      } catch (error) {
+        console.error("Error loading status map from AsyncStorage:", error)
+      }
+    }
+  
+    loadStatusMap()
+  }, [])
+  
+
+  const [statusMap, setStatusMap] = React.useState({})
+
+  const taskStat = async (id, stat) => {
+    try {
+      const currentTask = todo_list.find((task) => task.id === id)
+  
+      let updatedStatusMap
+  
+      if (stat === "Done") {
+        const dependentTask = currentTask.dependentTaskId
+        if (dependentTask != null) {
+          if (dependentTask.value != null) {
+            if (statusMap.hasOwnProperty(dependentTask.value.toString())) {
+              // Create a new object reference with updated statusMap
+              updatedStatusMap = {
+                ...statusMap,
+                [id]: stat,
+              }
+              // Update the statusMap state
+              setStatusMap(updatedStatusMap)
+              setModalUpdateVisible(false)
+            } else {
+              //if there is a dependency and status != done
+              Alert.alert("Alert", "The primary task must be completed first.", [
+                {
+                  text: "OK",
+                },
+              ])
+              return // Exit early if dependency is not completed
+            }
+          }
+        }
+  
+        // If there is no dependency or dependency is completed
+        updatedStatusMap = {
           ...statusMap,
           [id]: stat,
-        };
-        setStatusMap(updatedStatusMap);
-        setModalUpdateVisible(false);
+        }
+        setModalUpdateVisible(false)
+      } else {
+        // Create a new object reference with updated statusMap
+        updatedStatusMap = {
+          ...statusMap,
+          [id]: "Due",
+        }
       }
-    } else {
-      // Create a new object reference with updated statusMap
-      const updatedStatusMap = {
-        ...statusMap,
-        [id]: "Due",
-      };
+  
       // Update the statusMap state
-      setStatusMap(updatedStatusMap);
+      setStatusMap(updatedStatusMap)
+  
+      // Save the updated statusMap to AsyncStorage
+      await AsyncStorage.setItem("statusMap", JSON.stringify(updatedStatusMap))
+    } catch (error) {
+      console.error("Error updating task status and saving to AsyncStorage:", error)
     }
-  };
+  }
+
 
   // Function to open the modal for updating a selected plan/task
   const openModal = (item) => {
     // Set the selected item to the one passed as parameter
-    setSelectedItem(item);
+    setSelectedItem(item)
     // Set the modal task to the task of the selected item
-    setModalTask(item.task);
+    setModalTask(item.task)
     // Set the modal title to the title of the selected item
-    setModalTitle(item.title);
+    setModalTitle(item.title)
     // Set the modal dependency to the dependency ID of the selected item
-    setSelectedDependency(item.dependencyId);
+    setSelectedDependency(item.dependencyId)
     // Set the visibility of the update modal to true, thus opening the modal
-    setModalUpdateVisible(true);
+    setModalUpdateVisible(true)
     // Set the mode of the modal
-    setModalEditMode(true);
-  };
+    setModalEditMode(true)
+  }
 
   // Funtcio for Selected Iterations
   const handlePress = (option) => {
-    setSelectedIteration(option);
-    console.log("User selected iteration : ", option);
-  };
+    setSelectedIteration(option)
+    console.log("User selected iteration : ", option)
+  }
 
   const filterClicked = () => {
-    console.log("list:", todo_list, filterType);
-    console.log("statusMap:", statusMap);
+    console.log("list:", todo_list, filterType)
+    console.log("statusMap:", statusMap)
     const filtered = todo_list.filter(
       (task) => statusMap[task.id] === _.get(filterType, "value")
-    );
-    setFilteredTasks(filtered);
-  };
+    )
+    setFilteredTasks(filtered)
+  }
 
   const resetFilter = () => {
-    setFilteredTasks([]);
-  };
+    setFilteredTasks([])
+  }
 
   return (
     <View style={styles.container}>
@@ -264,7 +286,7 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
             data={filteredTasks.length > 0 ? filteredTasks : todo_list}
             keyExtractor={(item) => item.id}
             renderItem={({ item, index }) => {
-              const status = statusMap[item.id] || "On going";
+              const status = statusMap[item.id] || "On going"
               const cardTitle = (
                 <Text
                   style={{ color: "black", fontWeight: "bold", fontSize: 22 }}
@@ -272,8 +294,8 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
                   {" "}
                   {item.title || "[ No Title ]"}
                 </Text>
-              );
-              const cardSubTitleColor = status === "Done" ? "green" : "gray";
+              )
+              const cardSubTitleColor = status === "Done" ? "green" : "gray"
               const cardSubTitle = (
                 <Text style={{ color: cardSubTitleColor, fontSize: 15 }}>
                   Status : {status}{" "}
@@ -283,8 +305,8 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
                     <Icon name="calendar-check-o" size={17} color={iconColor} />
                   )}
                 </Text>
-              );
-              const iconColor = status === "Done" ? "green" : "gray";
+              )
+              const iconColor = status === "Done" ? "green" : "gray"
               const dependentOn = (
                 <Paragraph
                   style={{ marginTop: 10, color: "tomato", fontSize: 12 }}
@@ -295,8 +317,8 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
                     ? item.dependentTaskId.label
                     : "None"}
                 </Paragraph>
-              );
-              const period = item.iteration || "No Iteration Selected";
+              )
+              const period = item.iteration || "No Iteration Selected"
 
               const pointsLabel = (
                 <View style={styles.pointsContainer}>
@@ -310,7 +332,7 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
                     <Text style={styles.pointsText}>{item.points || 0}</Text>
                   </View>
                 </View>
-              );
+              )
 
               return (
                 <>
@@ -376,7 +398,7 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
                     </Card>
                   </Pressable>
                 </>
-              );
+              )
             }}
           />
         </View>
@@ -386,11 +408,11 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
           labelStyle={{ fontWeight: "bold", color: "white" }}
           style={{ backgroundColor: "tomato" }}
           onPress={() => {
-            setModalFormVisible(true);
-            setModalEditMode(false);
-            setTitle("");
-            setTask("");
-            setSelectedDependency(null);
+            setModalFormVisible(true)
+            setModalEditMode(false)
+            setTitle("")
+            setTask("")
+            setSelectedDependency(null)
           }}
         >
           Create a Task
@@ -457,8 +479,8 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
         transparent={true}
         visible={modalFormVisible || modalUpdateVisible}
         onRequestClose={() => {
-          setModalFormVisible(false);
-          setModalUpdateVisible(false);
+          setModalFormVisible(false)
+          setModalUpdateVisible(false)
         }}
       >
         <View style={styles.centeredView}>
@@ -479,7 +501,7 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
               <View>
                 <Pressable
                   onPress={() => {
-                    setModalFormVisible(false), setModalUpdateVisible(false);
+                    setModalFormVisible(false), setModalUpdateVisible(false)
                   }}
                 >
                   <Icon name="close" size={24} color="red" />
@@ -637,8 +659,8 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
         </View>
       </Modal>
     </View>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -767,14 +789,14 @@ const styles = StyleSheet.create({
     padding: 4,
     fontWeight: "bold",
   },
-});
+})
 
 const mapStateToProps = (state, ownProps) => {
   return {
     todo_list: state.todos.todo_list,
-  };
-};
+  }
+}
 
-const mapDispatchToProps = { addTodo, deleteTodo, updateTodo };
+const mapDispatchToProps = { addTodo, deleteTodo, updateTodo }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Tasks);
+export default connect(mapStateToProps, mapDispatchToProps)(Tasks)
