@@ -2,7 +2,7 @@ import React from "react";
 import ButtonIcon from "../components/ButtonIcon";
 import Spacer from "../components/Spacer";
 import Constants from "expo-constants";
-
+import _ from "lodash";
 import {
   Text,
   View,
@@ -30,7 +30,8 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
   const [modalUpdateVisible, setModalUpdateVisible] = React.useState(false);
   const [selectedIteration, setSelectedIteration] = React.useState(null);
   const [filterModalVisible, setFilterModalVisible] = React.useState(false);
-  const [filterType, setSelectedFilterType] = React.useState("");
+  const [filterType, setSelectedFilterType] = React.useState("On going");
+  const [filteredTasks, setFilteredTasks] = React.useState([]);
 
   const handleAddTodo = () => {
     if (task.trim() !== "") {
@@ -165,6 +166,7 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
   };
 
   const [statusMap, setStatusMap] = React.useState({});
+
   const taskStat = (id, stat) => {
     const currentTask = todo_list.find((task) => task.id === id);
 
@@ -173,11 +175,13 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
       if (dependentTask != null) {
         if (dependentTask.value != null) {
           if (statusMap.hasOwnProperty(dependentTask.value.toString())) {
-            //if there is a dependency and status == done
-            setStatusMap((prevStatusMap) => ({
-              ...prevStatusMap,
+            // Create a new object reference with updated statusMap
+            const updatedStatusMap = {
+              ...statusMap,
               [id]: stat,
-            }));
+            };
+            // Update the statusMap state
+            setStatusMap(updatedStatusMap);
             setModalUpdateVisible(false);
           } else {
             //if there is a dependency and status != done
@@ -189,25 +193,30 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
           }
         } else {
           //if there is no dependency
-          setStatusMap((prevStatusMap) => ({
-            ...prevStatusMap,
+          const updatedStatusMap = {
+            ...statusMap,
             [id]: stat,
-          }));
+          };
+          setStatusMap(updatedStatusMap);
           setModalUpdateVisible(false);
         }
       } else {
         //if there is no dependency
-        setStatusMap((prevStatusMap) => ({
-          ...prevStatusMap,
+        const updatedStatusMap = {
+          ...statusMap,
           [id]: stat,
-        }));
+        };
+        setStatusMap(updatedStatusMap);
         setModalUpdateVisible(false);
       }
     } else {
-      setStatusMap((prevStatusMap) => ({
-        ...prevStatusMap,
+      // Create a new object reference with updated statusMap
+      const updatedStatusMap = {
+        ...statusMap,
         [id]: "Due",
-      }));
+      };
+      // Update the statusMap state
+      setStatusMap(updatedStatusMap);
     }
   };
 
@@ -234,7 +243,16 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
   };
 
   const filterClicked = () => {
-    console.log("list:", todo_list);
+    console.log("list:", todo_list, filterType);
+    console.log("statusMap:", statusMap);
+    const filtered = todo_list.filter(
+      (task) => statusMap[task.id] === _.get(filterType, "value")
+    );
+    setFilteredTasks(filtered);
+  };
+
+  const resetFilter = () => {
+    setFilteredTasks([]);
   };
 
   return (
@@ -243,7 +261,7 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
         <Spacer />
         <View style={[styles.flatList]}>
           <FlatList
-            data={todo_list}
+            data={filteredTasks.length > 0 ? filteredTasks : todo_list}
             keyExtractor={(item) => item.id}
             renderItem={({ item, index }) => {
               const status = statusMap[item.id] || "On going";
@@ -394,26 +412,37 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
         visible={filterModalVisible}
       >
         <View style={styles.centeredView}>
-          <View style={styles.modalView}>
-            <Dropdown
-              style={styles.dropdown}
-              label="No Dependency"
-              data={generateDropdownData(todo_list ?? [])}
-              value={selectedDependency}
-              labelField="label"
-              valueField="value"
-              onChange={(value) => setSelectedFilterType(value)}
-            />
+          <View style={styles.filterModalView}>
+            <Text style={[styles.modalTitle, { paddingBottom: 10 }]}>
+              Filter by status
+            </Text>
+            <View style={{ paddingBottom: 10 }}>
+              <Dropdown
+                style={styles.dropdown}
+                label="No Dependency"
+                data={[
+                  { label: "On going", value: "On going" },
+                  { label: "Done", value: "Done" },
+                ]}
+                value={filterType}
+                labelField="label"
+                valueField="value"
+                onChange={(value) => setSelectedFilterType(value)}
+              />
+            </View>
             <View style={styles.filterButtonsContainer}>
               <Button
                 onPress={() => setFilterModalVisible(!filterModalVisible)}
               >
                 Close
               </Button>
+              <Button mode="contained" onPress={resetFilter}>
+                Reset Filter
+              </Button>
               <Button
                 mode="contained"
                 style={{ marginLeft: 10 }}
-                onPress={() => filterClicked()}
+                onPress={filterClicked}
               >
                 Filter
               </Button>
@@ -664,6 +693,20 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 20,
     alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 10,
+  },
+  filterModalView: {
+    margin: 15,
+    backgroundColor: "white",
+    borderRadius: 12,
+    padding: 20,
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
