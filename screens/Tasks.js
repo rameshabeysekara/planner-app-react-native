@@ -23,13 +23,15 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
   const [modalTask, setModalTask] = React.useState('')
   const [modalTitle, setModalTitle] = React.useState('')
   const [modalUpdateVisible, setModalUpdateVisible] = React.useState(false)
+  const [selectedIteration, setSelectedIteration] = React.useState(null)
 
   const handleAddTodo = () => {
     if (task.trim() !== '') {
       if (title.trim() !== '') {
-        addTodo(title, task, selectedDependency)
+        addTodo(title, task, selectedIteration, selectedDependency)
         setTask('')
         setTitle('')
+        setSelectedIteration(null)
         setSelectedDependency(null)
         setModalFormVisible(false)
       } else {
@@ -42,9 +44,10 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
           {
             text: 'OK',
             onPress: () => {
-              addTodo('', task, selectedDependency)
+              addTodo('', task, selectedIteration, selectedDependency)
               setTask('')
               setTitle('')
+              setSelectedIteration(null)
               setSelectedDependency(null)
               setModalFormVisible(false)
             },
@@ -61,7 +64,7 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
         {
           text: 'OK',
           onPress: () => {
-            addTodo('', task, selectedDependency)
+            addTodo('', task, selectedIteration, selectedDependency)
             setTask('')
             setTitle('')
             setSelectedDependency(null)
@@ -155,15 +158,15 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
   }
 
   const [statusMap, setStatusMap] = React.useState({})
-  const taskStat = ( id, stat ) => {
+  const taskStat = (id, stat) => {
 
     const currentTask = todo_list.find(task => task.id === id)
 
-    if ( stat === 'Done') {
+    if (stat === 'Done') {
       const dependentTask = currentTask.dependentTaskId
-      if(dependentTask != null) {
+      if (dependentTask != null) {
 
-        if(dependentTask.value != null) {
+        if (dependentTask.value != null) {
           if (statusMap.hasOwnProperty(dependentTask.value.toString())) {
             //if there is a dependency and status == done
             setStatusMap(prevStatusMap => ({
@@ -187,7 +190,7 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
           }))
           setModalUpdateVisible(false)
         }
-        
+
       } else {
         //if there is no dependency
         setStatusMap(prevStatusMap => ({
@@ -196,16 +199,16 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
         }))
         setModalUpdateVisible(false)
       }
-      
+
     } else {
 
-      setStatusMap( ( prevStatusMap ) => ({
+      setStatusMap((prevStatusMap) => ({
 
         ...prevStatusMap,
-        [ id ] : 'Due',
+        [id]: 'Due',
 
       }))
-    } 
+    }
   }
 
   // Function to open the modal for updating a selected plan/task
@@ -224,6 +227,11 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
     setModalEditMode(true)
   }
 
+  // Funtcio for Selected Iterations
+  const handlePress = (option) => {
+    setSelectedIteration(option)
+    console.log("User selected iteration : ", option)
+  }
 
 
   return (
@@ -238,13 +246,18 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
               const status = statusMap[item.id] || 'On going'
               const cardTitle = (<Text style={{ color: 'black', fontWeight: 'bold', fontSize: 22 }}> {item.title || '[ No Title ]'}</Text>)
               const cardSubTitleColor = status === 'Done' ? 'green' : 'gray'
-              const cardSubTitle = (<Text style={{ color: cardSubTitleColor, fontSize: 15 }} > Status : {status}</Text>)
+              const cardSubTitle = (<Text style={{ color: cardSubTitleColor, fontSize: 15 }}>
+                Status : {status} {' '}
+                {status === 'On going' ? ( <Icon name="hourglass-2" size={12} color={iconColor} /> ) : (
+                  <Icon name="calendar-check-o" size={17} color={iconColor} />)}
+              </Text>)
               const iconColor = status === 'Done' ? 'green' : 'gray'
-              const dependentOn = (<Paragraph style={{ marginTop: 10, color: 'gray', fontSize: 12 }}>
+              const dependentOn = (<Paragraph style={{ marginTop: 10, color: 'tomato', fontSize: 12 }}>
                 {/* To Do = Imasha */}
-                Dependent on: { item.dependentTaskId != null ? item.dependentTaskId.label : "None"}
+                Dependent on : {item.dependentTaskId != null ? item.dependentTaskId.label : "None"}
               </Paragraph>
               )
+              const period = item.iteration || 'No Iteration Selected'
 
               const pointsLabel = (
                 <View style={styles.pointsContainer}>
@@ -258,9 +271,8 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
               return (
                 <>
                   <Pressable key={item.id} onPress={() => openModal(item)}>
-                    <Card style={{ width: 350, marginTop: 10 }}> 
+                    <Card style={{ width: 365, marginTop: 12, margin:6 }}>
                       <Card.Title
-                        // title={`${item.title}` || cardTitle}
                         title={<>{cardTitle}</>}
                         subtitle={<>{cardSubTitle}</>}
                         left={(props) => (<CustomIcon name="sticky-note" size={50} color={iconColor} />)}
@@ -268,10 +280,20 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
                       />
                       <Card.Content >
                         <Paragraph style={{ paddingTop: 5, paddingBottom: 5 }}>{item.task}</Paragraph>
-                        {dependentOn}
-                        <Paragraph style={{ marginTop: 10, color: 'tomato', fontSize: 12 }}>
+                        <View style={{flexDirection:'row', justifyContent:'space-between'}}>
+                          <View>
+                            {dependentOn}
+                          </View>
+                          <View>
+                            <Text style={{ marginTop: 12, color: 'tomato', fontSize: 12 }}>
+                              Iteration : {period}
+                            </Text>
+                          </View>
+                        </View>
+                        {/* {dependentOn} */}
+                        <Paragraph style={{ color: 'gray', fontSize: 12 }}>
                           Tap to edit {' '}
-                          <Icon name="pencil" size={12} color="tomato" />
+                          <Icon name="pencil" size={12} color="gray" />
                         </Paragraph>
                       </Card.Content>
                       {/* display points */}
@@ -288,9 +310,7 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
         </View>
       </View>
       <View style={styles.buttonContainer}>
-        <Button
-          labelStyle={{ fontWeight: 'bold', color: 'white' }}
-          style={{ backgroundColor: 'tomato' }}
+        <Button labelStyle={{ fontWeight: 'bold', color: 'white' }} style={{ backgroundColor: 'tomato' }}
           onPress={() => {
             setModalFormVisible(true)
             setModalEditMode(false)
@@ -311,8 +331,7 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
         onRequestClose={() => {
           setModalFormVisible(false)
           setModalUpdateVisible(false)
-        }}
-      >
+        }} >
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
             <View style={{ flexDirection: "row", marginBottom: 10 }}>
@@ -330,39 +349,94 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
               </View>
             </View>
             <View>
-            <View>
-              <TextInput
-                style={styles.txtInput}
-                label="Title"
-                value={modalEditMode ? modalTitle : title}
-                onChangeText={(text) => (modalEditMode ? setModalTitle(text) : setTitle(text))}
-              />
-              <TextInput
-                style={styles.txtInput}
-                label="Task"
-                value={modalEditMode ? modalTask : task}
-                onChangeText={(text) => modalEditMode ? setModalTask(text) : setTask(text)}
-              />
-              
-            </View>
-            {!modalEditMode && (
               <View>
-                <View style={styles.separator}></View>
-                <Text style={styles.label}>Select Dependency</Text>
-                <Dropdown
-                  style={styles.dropdown}
-                  label="No Dependency"
-                  data={generateDropdownData(todo_list ?? [])}
-                  value={selectedDependency}
-                  search
-                  labelField="label"
-                  valueField="value"
-                  placeholder="No Dependency"
-                  searchPlaceholder="Search..."
-                  onChange={(value) => setSelectedDependency(value)}
+                <TextInput
+                  style={styles.txtInput}
+                  label="Title"
+                  value={modalEditMode ? modalTitle : title}
+                  onChangeText={(text) => (modalEditMode ? setModalTitle(text) : setTitle(text))}
                 />
+                <TextInput
+                  style={styles.txtInput}
+                  label="Task"
+                  value={modalEditMode ? modalTask : task}
+                  onChangeText={(text) => modalEditMode ? setModalTask(text) : setTask(text)}
+                />
+
               </View>
-            )}
+              {!modalEditMode && (
+                <View>
+                  <View style={styles.separator}></View>
+                  <Text style={styles.label}>Select Iteration</Text>
+                  <View style={{ flexDirection: 'row' }}>
+                    <Pressable
+                      style={({ pressed }) => [
+                        styles.iterationPress,
+                        selectedIteration === "Once" ? styles.selected : null,
+                        { backgroundColor: pressed ? 'lightcoral' : selectedIteration === "Once" ? 'tomato' : 'lightgray' }
+                      ]}
+                      onPress={() => handlePress("Once")}
+                    >
+                      <Text style={{ fontWeight: 'bold', color: 'white' }}>
+                        Once
+                      </Text>
+                    </Pressable>
+
+                    <Pressable
+                      style={({ pressed }) => [
+                        styles.iterationPress,
+                        selectedIteration === "Daily" ? styles.selected : null,
+                        { backgroundColor: pressed ? 'lightcoral' : selectedIteration === "Daily" ? 'tomato' : 'lightgray' }
+                      ]}
+                      onPress={() => handlePress("Daily")}
+                    >
+                      <Text style={{ fontWeight: 'bold', color: 'white' }}>
+                        Daily
+                      </Text>
+                    </Pressable>
+
+                    <Pressable
+                      style={({ pressed }) => [
+                        styles.iterationPress,
+                        selectedIteration === "Weekly" ? styles.selected : null,
+                        { backgroundColor: pressed ? 'lightcoral' : selectedIteration === "Weekly" ? 'tomato' : 'lightgray' }
+                      ]}
+                      onPress={() => handlePress("Weekly")}
+                    >
+                      <Text style={{ fontWeight: 'bold', color: 'white' }}>
+                        Weekly
+                      </Text>
+                    </Pressable>
+
+                    <Pressable
+                      style={({ pressed }) => [
+                        styles.iterationPress,
+                        selectedIteration === "Monthly" ? styles.selected : null,
+                        { backgroundColor: pressed ? 'lightcoral' : selectedIteration === "Monthly" ? 'tomato' : 'lightgray' }
+                      ]}
+                      onPress={() => handlePress("Monthly")}
+                    >
+                      <Text style={{ fontWeight: 'bold', color: 'white' }}>
+                        Monthly
+                      </Text>
+                    </Pressable>
+                  </View>
+                  <View style={styles.separator}></View>
+                  <Text style={styles.label}>Select Dependency</Text>
+                  <Dropdown
+                    style={styles.dropdown}
+                    label="No Dependency"
+                    data={generateDropdownData(todo_list ?? [])}
+                    value={selectedDependency}
+                    search
+                    labelField="label"
+                    valueField="value"
+                    placeholder="No Dependency"
+                    searchPlaceholder="Search..."
+                    onChange={(value) => setSelectedDependency(value)}
+                  />
+                </View>
+              )}
 
             </View>
 
@@ -370,18 +444,14 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
             <View style={{ flexDirection: 'row', }}>
               {modalEditMode && (
                 <View style={{ flex: 1 }}>
-                  <Button
-                    labelStyle={{ fontWeight: 'bold', color: 'white' }}
-                    style={{ backgroundColor: 'green' }}
-                    onPress={ () => taskStat( selectedItem.id, 'Done' ) } >
+                  <Button labelStyle={{ fontWeight: 'bold', color: 'white' }} style={{ backgroundColor: 'green' }}
+                    onPress={() => taskStat(selectedItem.id, 'Done')} >
                     <Text> Done Task </Text>
                   </Button>
                 </View>
               )}
               <View style={{ flex: 1 }}>
-                <Button
-                  style={{ alignSelf: "center" }}
-                  icon={modalEditMode ? "note" : "note-plus"}
+                <Button style={{ alignSelf: "center" }} icon={modalEditMode ? "note" : "note-plus"}
                   onPress={() => (modalEditMode ? handleupdateTodo(selectedItem.id) : handleAddTodo())} >
                   {modalEditMode ? 'Update Task' : 'Save Task'}
                 </Button>
@@ -404,8 +474,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   flatList: {
-    paddingTop: Constants.statusBarHeight,
-    flexGrows: 1
+    // paddingTop: Constants.statusBarHeight,
+    marginTop: Constants.statusBarHeight,
+    flexGrows: 1,
+    paddingBottom: Constants.statusBarHeight,
   },
   separator: {
     height: 10,
@@ -468,34 +540,16 @@ const styles = StyleSheet.create({
     width: 300,
     margin: 5
   },
-  pointsContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingBottom: 5
-  },
-  
-  pointsCard: {
-    flexDirection: 'row',
-    backgroundColor: 'white',
-    borderRadius: 15,
-    padding: 4,
-    marginRight: 5,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  
-  pointsText: {
-    color: 'black',
-    padding: 4,
-    fontWeight: 'bold',
-  },
-  
+  iterationPress: {
+    padding: 7,
+    margin: 3,
+    width: 71,
+    height: 40,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 30,
+  }
+
 
 })
 
