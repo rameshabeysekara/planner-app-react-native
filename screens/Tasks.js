@@ -178,13 +178,13 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
   console.log('Category Value:', categoryValue);
   switch (categoryValue) {
     case 'Work':
-      return 'building-o';
+      return 'briefcase';
     case 'Personal':
-      return 'user';
+      return 'street-view';
     case 'School':
       return 'graduation-cap';
     case 'Fitness':
-      return 'dumbbell';
+      return 'bicycle';
     case 'Health':
       return 'heartbeat';
     case 'Family':
@@ -192,7 +192,7 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
     case 'Finance':
       return 'dollar';
     case 'Home':
-      return 'home';
+      return 'building-o';
     case 'Hobbies':
       return 'paint-brush';
     case 'Travel':
@@ -348,6 +348,13 @@ const CustomIcon = ({ category, size, color }) => {
                     : "None"}
                 </Paragraph>
               );
+
+              const taskCategory = (
+                <Text style={{ color: "grey", fontWeight: "bold", fontSize: 10, marginTop: 20 }}>
+                  #{item.category?.label || "No Category"}
+                </Text>
+              );
+
               const period = item.iteration || "No Iteration Selected";
 
               const pointsLabel = (
@@ -395,8 +402,8 @@ const CustomIcon = ({ category, size, color }) => {
                             flexDirection: "column",
                             justifyContent: "start",
                             gap: -5
-                          }}
-                        >
+                          }}>
+                          {/* {dependentOn} */}
                           <View>{dependentOn}</View>
                           <View>
                             <Text
@@ -409,8 +416,9 @@ const CustomIcon = ({ category, size, color }) => {
                               Iteration : {period}
                             </Text>
                           </View>
+                        <View>{taskCategory}</View>
                         </View>
-                        {/* {dependentOn} */}
+                        
                         <Text style={{ position: "absolute", bottom: -35, left: 15, color: "gray", fontSize: 12 }}>
                           Tap to edit{" "}
                           <Icon name="pencil" size={12} color="gray" />
