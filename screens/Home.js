@@ -1,9 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Text, View, StyleSheet, SafeAreaView } from "react-native";
 import { FontAwesome as Icon } from '@expo/vector-icons';
+import { connect } from 'react-redux'; 
 
-const Home = () => {
-  const [points, setPoints] = useState(100); 
+const Home = ({ totalPoints }) => {
+  const [points, setPoints] = useState(0); 
+
+  useEffect(() => {
+    
+    setPoints(totalPoints);
+  }, [totalPoints]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -11,7 +17,7 @@ const Home = () => {
         <View style={styles.pointsContainer}>
           <View style={styles.pointsCard}>
             <Icon name="trophy" size={20} color="tomato" style={{ padding: 3 }} />
-            <Text style={styles.pointsText}>{points}</Text>
+            <Text style={styles.pointsText}>{ points || 0}</Text>
           </View>
         </View>
       </View>
@@ -68,7 +74,12 @@ const styles = StyleSheet.create({
     padding: 4,
     fontWeight: 'bold',
   },
-
 });
 
-export default Home;
+const mapStateToProps = (state) => {
+  return {
+    totalPoints: state.todos.totalPoints,
+  };
+};
+
+export default connect(mapStateToProps)(Home); 
