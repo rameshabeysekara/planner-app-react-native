@@ -44,7 +44,6 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
         setSelectedDependency(null);
         setModalFormVisible(false);
         setSelectedCategory("")
-        console.log("Selected Category:", selectedCategory.value);
       } else {
         // If the title is empty, prompt the user
         Alert.alert("Alert", "Do you want to add the task without a title?", [
@@ -174,8 +173,6 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
   // Function to get the corresponding icon based on the selected category
  const getIconForCategory = (category) => {
   const categoryValue = category?.value || '';
-  console.log('Category:', category);
-  console.log('Category Value:', categoryValue);
   switch (categoryValue) {
     case 'Work':
       return 'briefcase';
@@ -349,12 +346,6 @@ const CustomIcon = ({ category, size, color }) => {
                 </Paragraph>
               );
 
-              const taskCategory = (
-                <Text style={{ color: "grey", fontWeight: "bold", fontSize: 10, marginTop: 20 }}>
-                  #{item.category?.label || "No Category"}
-                </Text>
-              );
-
               const period = item.iteration || "No Iteration Selected";
 
               const pointsLabel = (
@@ -416,7 +407,6 @@ const CustomIcon = ({ category, size, color }) => {
                               Iteration : {period}
                             </Text>
                           </View>
-                        <View>{taskCategory}</View>
                         </View>
                         
                         <Text style={{ position: "absolute", bottom: -35, left: 15, color: "gray", fontSize: 12 }}>
