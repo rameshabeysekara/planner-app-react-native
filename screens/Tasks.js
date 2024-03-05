@@ -22,29 +22,31 @@ import AsyncStorage from "@react-native-async-storage/async-storage"
 
 
 const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
-  const [modalFormVisible, setModalFormVisible] = React.useState(false)
-  const [title, setTitle] = React.useState("")
-  const [task, setTask] = React.useState("")
-  const [selectedDependency, setSelectedDependency] = React.useState(null)
-  const [modalEditMode, setModalEditMode] = React.useState(false)
-  const [selectedItem, setSelectedItem] = React.useState(null)
-  const [modalTask, setModalTask] = React.useState("")
-  const [modalTitle, setModalTitle] = React.useState("")
-  const [modalUpdateVisible, setModalUpdateVisible] = React.useState(false)
-  const [selectedIteration, setSelectedIteration] = React.useState(null)
-  const [filterModalVisible, setFilterModalVisible] = React.useState(false)
-  const [filterType, setSelectedFilterType] = React.useState("On going")
-  const [filteredTasks, setFilteredTasks] = React.useState([])
+  const [modalFormVisible, setModalFormVisible] = React.useState(false);
+  const [title, setTitle] = React.useState("");
+  const [task, setTask] = React.useState("");
+  const [selectedDependency, setSelectedDependency] = React.useState(null);
+  const [modalEditMode, setModalEditMode] = React.useState(false);
+  const [selectedItem, setSelectedItem] = React.useState(null);
+  const [modalTask, setModalTask] = React.useState("");
+  const [modalTitle, setModalTitle] = React.useState("");
+  const [modalUpdateVisible, setModalUpdateVisible] = React.useState(false);
+  const [selectedIteration, setSelectedIteration] = React.useState(null);
+  const [filterModalVisible, setFilterModalVisible] = React.useState(false);
+  const [filterType, setSelectedFilterType] = React.useState("On going");
+  const [filteredTasks, setFilteredTasks] = React.useState([]);
+  const [selectedCategory, setSelectedCategory] = React.useState("");
 
   const handleAddTodo = () => {
     if (task.trim() !== "") {
       if (title.trim() !== "") {
-        addTodo(title, task, selectedIteration, selectedDependency)
-        setTask("")
-        setTitle("")
-        setSelectedIteration(null)
-        setSelectedDependency(null)
-        setModalFormVisible(false)
+        addTodo(title, task, selectedIteration, selectedDependency, selectedCategory);
+        setTask("");
+        setTitle("");
+        setSelectedIteration(null);
+        setSelectedDependency(null);
+        setModalFormVisible(false);
+        setSelectedCategory("")
       } else {
         // If the title is empty, prompt the user
         Alert.alert("Alert", "Do you want to add the task without a title?", [
@@ -55,12 +57,12 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
           {
             text: "OK",
             onPress: () => {
-              addTodo("", task, selectedIteration, selectedDependency)
-              setTask("")
-              setTitle("")
-              setSelectedIteration(null)
-              setSelectedDependency(null)
-              setModalFormVisible(false)
+              addTodo("", task, selectedIteration, selectedDependency, selectedCategory);
+              setTask("");
+              setTitle("");
+              setSelectedIteration(null);
+              setSelectedDependency(null);
+              setModalFormVisible(false);
             },
           },
         ])
@@ -75,11 +77,11 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
         {
           text: "OK",
           onPress: () => {
-            addTodo("", task, selectedIteration, selectedDependency)
-            setTask("")
-            setTitle("")
-            setSelectedDependency(null)
-            setModalFormVisible(false)
+            addTodo("", task, selectedIteration, selectedDependency, selectedCategory);
+            setTask("");
+            setTitle("");
+            setSelectedDependency(null);
+            setModalFormVisible(false);
           },
         },
       ])
@@ -151,40 +153,71 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
     dropdownData.unshift({
       label: "No Dependency",
       value: null,
-    })
-    return dropdownData
+    });
+    return dropdownData;
+  };
+
+  const generateCategoryDropdownData = () => {
+  return [
+    { label: 'Work', value: 'Work' },
+    { label: 'Personal', value: 'Personal' },
+    { label: 'School', value: 'School' },
+    { label: 'Fitness', value: 'Fitness' },
+    { label: 'Health', value: 'Health' },
+    { label: 'Family', value: 'Family' },
+    { label: 'Finance', value: 'Finance' },
+    { label: 'Home', value: 'Home' },
+    { label: 'Hobbies', value: 'Hobbies' },
+    { label: 'Travel', value: 'Travel' },
+    { label: 'Entertainment', value: 'Entertainment' },
+  ];
+};
+
+  // Function to get the corresponding icon based on the selected category
+ const getIconForCategory = (category) => {
+  const categoryValue = category?.value || '';
+  switch (categoryValue) {
+    case 'Work':
+      return 'briefcase';
+    case 'Personal':
+      return 'street-view';
+    case 'School':
+      return 'graduation-cap';
+    case 'Fitness':
+      return 'bicycle';
+    case 'Health':
+      return 'heartbeat';
+    case 'Family':
+      return 'users';
+    case 'Finance':
+      return 'dollar';
+    case 'Home':
+      return 'building-o';
+    case 'Hobbies':
+      return 'paint-brush';
+    case 'Travel':
+      return 'plane';
+    case 'Entertainment':
+      return 'film';
+    default:
+      return 'sticky-note';
   }
+};
+
 
   // Custom Icon Component
-  const CustomIcon = ({ name, size, color, label }) => {
-    return (
-      // View containing the icon and its label
-      <View style={{ flexDirection: "column", alignItems: "center" }}>
-        {/* Icon component with specified name, size, and color */}
-        <Icon name={name} size={size} color={color} />
-        {/* Text label displayed below the icon */}
-        <Text style={{ marginLeft: 2 }}>{label}</Text>
-      </View>
-    )
-  }
+const CustomIcon = ({ category, size, color }) => {
+  const iconName = getIconForCategory(category);
 
-  React.useEffect(() => {
-    const loadStatusMap = async () => {
-      try {
-        const statusMapString = await AsyncStorage.getItem("statusMap")
-        if (statusMapString !== null) {
-          setStatusMap(JSON.parse(statusMapString))
-        }
-      } catch (error) {
-        console.error("Error loading status map from AsyncStorage:", error)
-      }
-    }
-  
-    loadStatusMap()
-  }, [])
-  
+  return (
+    <View style={{ flexDirection: "column", alignItems: "center" }}>
+      <Icon name={iconName} size={size} color={color} />
+    </View>
+  );
+};
 
-  const [statusMap, setStatusMap] = React.useState({})
+
+  const [statusMap, setStatusMap] = React.useState({});
 
   const taskStat = async (id, stat) => {
     try {
@@ -258,7 +291,7 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
     setModalEditMode(true)
   }
 
-  // Funtcio for Selected Iterations
+  // Function for Selected Iterations
   const handlePress = (option) => {
     setSelectedIteration(option)
     console.log("User selected iteration : ", option)
@@ -289,7 +322,7 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
               const status = statusMap[item.id] || "On going"
               const cardTitle = (
                 <Text
-                  style={{ color: "black", fontWeight: "bold", fontSize: 22 }}
+                  style={{ color: "black", fontWeight: "bold", fontSize: 20, }}
                 >
                   {" "}
                   {item.title || "[ No Title ]"}
@@ -317,8 +350,9 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
                     ? item.dependentTaskId.label
                     : "None"}
                 </Paragraph>
-              )
-              const period = item.iteration || "No Iteration Selected"
+              );
+
+              const period = item.iteration || "No Iteration Selected";
 
               const pointsLabel = (
                 <View style={styles.pointsContainer}>
@@ -343,10 +377,10 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
                         subtitle={<>{cardSubTitle}</>}
                         left={(props) => (
                           <CustomIcon
-                            name="sticky-note"
-                            size={50}
-                            color={iconColor}
-                          />
+                          category={item.category} 
+                          size={40}
+                          color={iconColor}
+                        />
                         )}
                         right={(props) => (
                           <ButtonIcon
@@ -362,10 +396,11 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
                         </Paragraph>
                         <View
                           style={{
-                            flexDirection: "row",
-                            justifyContent: "space-between",
-                          }}
-                        >
+                            flexDirection: "column",
+                            justifyContent: "start",
+                            gap: -5
+                          }}>
+                          {/* {dependentOn} */}
                           <View>{dependentOn}</View>
                           <View>
                             <Text
@@ -379,11 +414,11 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
                             </Text>
                           </View>
                         </View>
-                        {/* {dependentOn} */}
-                        <Paragraph style={{ color: "gray", fontSize: 12 }}>
+                        
+                        <Text style={{ position: "absolute", bottom: -35, left: 15, color: "gray", fontSize: 12 }}>
                           Tap to edit{" "}
                           <Icon name="pencil" size={12} color="gray" />
-                        </Paragraph>
+                        </Text>
                       </Card.Content>
                       {/* display points */}
                       <Card.Actions
@@ -611,6 +646,21 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
                     </Pressable>
                   </View>
                   <View style={styles.separator}></View>
+                  <Text style={styles.label}>Select Category</Text>
+                  <Dropdown
+                    style={styles.dropdown}
+                    label="Task Category"
+                    data={generateCategoryDropdownData()}
+                    value={selectedCategory}
+                    search
+                    labelField="label"
+                    valueField="value"
+                    placeholder="Task Category"
+                    searchPlaceholder="Search..."
+                    onChange={(value) => setSelectedCategory(value)}
+                  />
+
+                  <View style={styles.separator}></View>
                   <Text style={styles.label}>Select Dependency</Text>
                   <Dropdown
                     style={styles.dropdown}
@@ -671,7 +721,7 @@ const styles = StyleSheet.create({
   flatList: {
     // paddingTop: Constants.statusBarHeight,
     marginTop: Constants.statusBarHeight,
-    flexGrows: 1,
+    flexGrow: 1,
     paddingBottom: Constants.statusBarHeight,
   },
   separator: {
