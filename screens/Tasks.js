@@ -40,13 +40,19 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
   const handleAddTodo = () => {
     if (task.trim() !== "") {
       if (title.trim() !== "") {
-        addTodo(title, task, selectedIteration, selectedDependency, selectedCategory);
+        addTodo(
+          title,
+          task,
+          selectedIteration,
+          selectedDependency,
+          selectedCategory
+        );
         setTask("");
         setTitle("");
         setSelectedIteration(null);
         setSelectedDependency(null);
         setModalFormVisible(false);
-        setSelectedCategory("")
+        setSelectedCategory("");
       } else {
         // If the title is empty, prompt the user
         Alert.alert("Alert", "Do you want to add the task without a title?", [
@@ -57,7 +63,13 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
           {
             text: "OK",
             onPress: () => {
-              addTodo("", task, selectedIteration, selectedDependency, selectedCategory);
+              addTodo(
+                "",
+                task,
+                selectedIteration,
+                selectedDependency,
+                selectedCategory
+              );
               setTask("");
               setTitle("");
               setSelectedIteration(null);
@@ -77,7 +89,13 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
         {
           text: "OK",
           onPress: () => {
-            addTodo("", task, selectedIteration, selectedDependency, selectedCategory);
+            addTodo(
+              "",
+              task,
+              selectedIteration,
+              selectedDependency,
+              selectedCategory
+            );
             setTask("");
             setTitle("");
             setSelectedDependency(null);
@@ -158,64 +176,62 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
   };
 
   const generateCategoryDropdownData = () => {
-  return [
-    { label: 'Work', value: 'Work' },
-    { label: 'Personal', value: 'Personal' },
-    { label: 'School', value: 'School' },
-    { label: 'Fitness', value: 'Fitness' },
-    { label: 'Health', value: 'Health' },
-    { label: 'Family', value: 'Family' },
-    { label: 'Finance', value: 'Finance' },
-    { label: 'Home', value: 'Home' },
-    { label: 'Hobbies', value: 'Hobbies' },
-    { label: 'Travel', value: 'Travel' },
-    { label: 'Entertainment', value: 'Entertainment' },
-  ];
-};
+    return [
+      { label: "Work", value: "Work" },
+      { label: "Personal", value: "Personal" },
+      { label: "School", value: "School" },
+      { label: "Fitness", value: "Fitness" },
+      { label: "Health", value: "Health" },
+      { label: "Family", value: "Family" },
+      { label: "Finance", value: "Finance" },
+      { label: "Home", value: "Home" },
+      { label: "Hobbies", value: "Hobbies" },
+      { label: "Travel", value: "Travel" },
+      { label: "Entertainment", value: "Entertainment" },
+    ];
+  };
 
   // Function to get the corresponding icon based on the selected category
- const getIconForCategory = (category) => {
-  const categoryValue = category?.value || '';
-  switch (categoryValue) {
-    case 'Work':
-      return 'briefcase';
-    case 'Personal':
-      return 'street-view';
-    case 'School':
-      return 'graduation-cap';
-    case 'Fitness':
-      return 'bicycle';
-    case 'Health':
-      return 'heartbeat';
-    case 'Family':
-      return 'users';
-    case 'Finance':
-      return 'dollar';
-    case 'Home':
-      return 'building-o';
-    case 'Hobbies':
-      return 'paint-brush';
-    case 'Travel':
-      return 'plane';
-    case 'Entertainment':
-      return 'film';
-    default:
-      return 'sticky-note';
-  }
-};
-
+  const getIconForCategory = (category) => {
+    const categoryValue = category?.value || "";
+    switch (categoryValue) {
+      case "Work":
+        return "briefcase";
+      case "Personal":
+        return "street-view";
+      case "School":
+        return "graduation-cap";
+      case "Fitness":
+        return "bicycle";
+      case "Health":
+        return "heartbeat";
+      case "Family":
+        return "users";
+      case "Finance":
+        return "dollar";
+      case "Home":
+        return "building-o";
+      case "Hobbies":
+        return "paint-brush";
+      case "Travel":
+        return "plane";
+      case "Entertainment":
+        return "film";
+      default:
+        return "sticky-note";
+    }
+  };
 
   // Custom Icon Component
-const CustomIcon = ({ category, size, color }) => {
-  const iconName = getIconForCategory(category);
+  const CustomIcon = ({ category, size, color }) => {
+    const iconName = getIconForCategory(category);
 
-  return (
-    <View style={{ flexDirection: "column", alignItems: "center" }}>
-      <Icon name={iconName} size={size} color={color} />
-    </View>
-  );
-};
-
+    return (
+      <View style={{ flexDirection: "column", alignItems: "center" }}>
+        <Icon name={iconName} size={size} color={color} />
+      </View>
+    );
+  };
 
   const [statusMap, setStatusMap] = React.useState({});
 
@@ -322,7 +338,7 @@ const CustomIcon = ({ category, size, color }) => {
               const status = statusMap[item.id] || "On going"
               const cardTitle = (
                 <Text
-                  style={{ color: "black", fontWeight: "bold", fontSize: 20, }}
+                  style={{ color: "black", fontWeight: "bold", fontSize: 20 }}
                 >
                   {" "}
                   {item.title || "[ No Title ]"}
@@ -377,10 +393,10 @@ const CustomIcon = ({ category, size, color }) => {
                         subtitle={<>{cardSubTitle}</>}
                         left={(props) => (
                           <CustomIcon
-                          category={item.category} 
-                          size={40}
-                          color={iconColor}
-                        />
+                            category={item.category}
+                            size={40}
+                            color={iconColor}
+                          />
                         )}
                         right={(props) => (
                           <ButtonIcon
@@ -398,8 +414,9 @@ const CustomIcon = ({ category, size, color }) => {
                           style={{
                             flexDirection: "column",
                             justifyContent: "start",
-                            gap: -5
-                          }}>
+                            gap: -5,
+                          }}
+                        >
                           {/* {dependentOn} */}
                           <View>{dependentOn}</View>
                           <View>
@@ -414,8 +431,16 @@ const CustomIcon = ({ category, size, color }) => {
                             </Text>
                           </View>
                         </View>
-                        
-                        <Text style={{ position: "absolute", bottom: -35, left: 15, color: "gray", fontSize: 12 }}>
+
+                        <Text
+                          style={{
+                            position: "absolute",
+                            bottom: -35,
+                            left: 15,
+                            color: "gray",
+                            fontSize: 12,
+                          }}
+                        >
                           Tap to edit{" "}
                           <Icon name="pencil" size={12} color="gray" />
                         </Text>
@@ -470,9 +495,25 @@ const CustomIcon = ({ category, size, color }) => {
       >
         <View style={styles.centeredView}>
           <View style={styles.filterModalView}>
-            <Text style={[styles.modalTitle, { paddingBottom: 10 }]}>
-              Filter by status
-            </Text>
+            <View style={{ flexDirection: "row", marginBottom: 30 }}>
+              <View style={{ flex: 1, flexDirection: "row" }}>
+                <Text
+                  style={[
+                    styles.modalTitle,
+                    { paddingLeft: 10, paddingTop: 3 },
+                  ]}
+                >
+                  Filter by status
+                </Text>
+              </View>
+              <View>
+                <Pressable
+                  onPress={() => setFilterModalVisible(!filterModalVisible)}
+                >
+                  <Icon name="close" size={24} color="red" />
+                </Pressable>
+              </View>
+            </View>
             <View style={{ paddingBottom: 10 }}>
               <Dropdown
                 style={styles.dropdown}
@@ -488,12 +529,7 @@ const CustomIcon = ({ category, size, color }) => {
               />
             </View>
             <View style={styles.filterButtonsContainer}>
-              <Button
-                onPress={() => setFilterModalVisible(!filterModalVisible)}
-              >
-                Close
-              </Button>
-              <Button mode="contained" onPress={resetFilter}>
+              <Button onPress={resetFilter}>
                 Reset Filter
               </Button>
               <Button
@@ -813,6 +849,7 @@ const styles = StyleSheet.create({
   filterButtonsContainer: {
     flexDirection: "row",
     alignSelf: "center",
+    paddingTop: 20
   },
   pointsContainer: {
     flexDirection: "row",
