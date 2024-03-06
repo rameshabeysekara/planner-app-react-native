@@ -233,6 +233,22 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
     );
   };
 
+  React.useEffect(() => {
+    const loadStatusMap = async () => {
+      try {
+        const statusMapString = await AsyncStorage.getItem("statusMap");
+        if (statusMapString !== null) {
+          setStatusMap(JSON.parse(statusMapString));
+        }
+      } catch (error) {
+        console.error("Error loading status map from AsyncStorage:", error);
+      }
+    };
+  
+    loadStatusMap();
+  }, []);
+  
+
   const [statusMap, setStatusMap] = React.useState({});
 
   const taskStat = async (id, stat) => {
