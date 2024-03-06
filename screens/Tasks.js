@@ -330,12 +330,11 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
   }
 
   const filterClicked = () => {
-    console.log("list:", todo_list, filterType)
-    console.log("statusMap:", statusMap)
-    const filtered = todo_list.filter(
-      (task) => statusMap[task.id] === _.get(filterType, "value")
-    )
-    setFilteredTasks(filtered)
+    const filtered = todo_list.filter((task) => {
+      const status = statusMap[task.id] || "On going";
+      return status === _.get(filterType, "value");
+    });
+    setFilteredTasks(filtered);
   }
 
   const resetFilter = () => {
