@@ -1,4 +1,4 @@
-import { ADD_TODO, DELETE_TODO, UPDATE_TODO, ADD_TO_ACTIVITY_LOG } from "../actionTypes";
+import { ADD_TODO, DELETE_TODO, UPDATE_TODO, ADD_TO_ACTIVITY_LOG, UPDATE_TOTAL_POINTS } from "../actionTypes";
 
 const initialState = {
   todo_list: [],
@@ -47,8 +47,7 @@ export default function (state = initialState, action) {
           }
           return todo;
         }),
-        activityLog: [log, ...(Array.isArray(state.activityLog) ? state.activityLog : [])],
-        totalPoints: state.totalPoints + 10,
+        activityLog: [log, ...(Array.isArray(state.activityLog) ? state.activityLog : [])]
       };
     }
 
@@ -81,6 +80,13 @@ export default function (state = initialState, action) {
           },
           ...state.activityLog,
         ],
+      };
+    }
+
+    case UPDATE_TOTAL_POINTS: {
+      return {
+        ...state,
+        totalPoints: action.payload,
       };
     }
 

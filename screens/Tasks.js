@@ -16,12 +16,12 @@ import { Dropdown } from "react-native-element-dropdown"
 import { Button, TextInput, Card, Paragraph } from "react-native-paper"
 import { FontAwesome as Icon } from "@expo/vector-icons"
 import { connect } from "react-redux"
-import { addTodo, deleteTodo, updateTodo } from "../redux/actions"
+import { addTodo, deleteTodo, updateTodo, updateTotalPoints } from "../redux/actions"
 
 import AsyncStorage from "@react-native-async-storage/async-storage"
 
 
-const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
+const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo, totalPoints, updateTotalPoints }) => {
   const [modalFormVisible, setModalFormVisible] = React.useState(false);
   const [title, setTitle] = React.useState("");
   const [task, setTask] = React.useState("");
@@ -36,6 +36,7 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
   const [filterType, setSelectedFilterType] = React.useState("On going");
   const [filteredTasks, setFilteredTasks] = React.useState([]);
   const [selectedCategory, setSelectedCategory] = React.useState("");
+
 
   const handleAddTodo = () => {
     if (task.trim() !== "") {
@@ -269,6 +270,10 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
               }
               // Update the statusMap state
               setStatusMap(updatedStatusMap)
+
+              const updatedPoints = totalPoints + 10;
+              updateTotalPoints(updatedPoints);
+
               setModalUpdateVisible(false)
             } else {
               //if there is a dependency and status != done
@@ -287,6 +292,8 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
           ...statusMap,
           [id]: stat,
         }
+        const updatedPoints = totalPoints + 10;
+        updateTotalPoints(updatedPoints);
         setModalUpdateVisible(false)
       } else {
         // Create a new object reference with updated statusMap
@@ -296,6 +303,9 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
         }
       }
   
+      const updatedPoints = totalPoints > 10 ? totalPoints - 10 : 0;
+      updateTotalPoints(updatedPoints);
+
       // Update the statusMap state
       setStatusMap(updatedStatusMap)
   
@@ -896,9 +906,10 @@ const styles = StyleSheet.create({
 const mapStateToProps = (state, ownProps) => {
   return {
     todo_list: state.todos.todo_list,
+    totalPoints: state.todos.totalPoints
   }
 }
 
-const mapDispatchToProps = { addTodo, deleteTodo, updateTodo }
+const mapDispatchToProps = { addTodo, deleteTodo, updateTodo, updateTotalPoints }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Tasks)
