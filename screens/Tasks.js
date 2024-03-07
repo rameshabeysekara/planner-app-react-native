@@ -1,3 +1,4 @@
+
 import React from "react"
 import ButtonIcon from "../components/ButtonIcon"
 import Spacer from "../components/Spacer"
@@ -16,44 +17,51 @@ import { Dropdown } from "react-native-element-dropdown"
 import { Button, TextInput, Card, Paragraph } from "react-native-paper"
 import { FontAwesome as Icon } from "@expo/vector-icons"
 import { connect } from "react-redux"
-import { addTodo, deleteTodo, updateTodo, updateTotalPoints } from "../redux/actions"
-
-import AsyncStorage from "@react-native-async-storage/async-storage"
+import { addTodo, deleteTodo, updateTodo, updateTotalPoints, updateStatusTodo } from "../redux/actions"
 
 
-const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo, totalPoints, updateTotalPoints }) => {
-  const [modalFormVisible, setModalFormVisible] = React.useState(false);
-  const [title, setTitle] = React.useState("");
-  const [task, setTask] = React.useState("");
-  const [selectedDependency, setSelectedDependency] = React.useState(null);
-  const [modalEditMode, setModalEditMode] = React.useState(false);
-  const [selectedItem, setSelectedItem] = React.useState(null);
-  const [modalTask, setModalTask] = React.useState("");
-  const [modalTitle, setModalTitle] = React.useState("");
-  const [modalUpdateVisible, setModalUpdateVisible] = React.useState(false);
-  const [selectedIteration, setSelectedIteration] = React.useState(null);
-  const [filterModalVisible, setFilterModalVisible] = React.useState(false);
-  const [filterType, setSelectedFilterType] = React.useState("On going");
-  const [filteredTasks, setFilteredTasks] = React.useState([]);
-  const [selectedCategory, setSelectedCategory] = React.useState("");
+const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo, totalPoints, updateTotalPoints, updateStatusTodo }) => {
+  const [modalFormVisible, setModalFormVisible] = React.useState(false)
+  const [title, setTitle] = React.useState("")
+  const [task, setTask] = React.useState("")
+  const [selectedDependency, setSelectedDependency] = React.useState(null)
+  const [modalEditMode, setModalEditMode] = React.useState(false)
+  const [selectedItem, setSelectedItem] = React.useState(null)
+  const [modalTask, setModalTask] = React.useState("")
+  const [modalTitle, setModalTitle] = React.useState("")
+  const [modalUpdateVisible, setModalUpdateVisible] = React.useState(false)
+  const [selectedIteration, setSelectedIteration] = React.useState(null)
+  const [filterModalVisible, setFilterModalVisible] = React.useState(false)
+  const [filterType, setSelectedFilterType] = React.useState("On going")
+  const [filteredTasks, setFilteredTasks] = React.useState([])
+  const [selectedCategory, setSelectedCategory] = React.useState("")
+  const [statusTodo, setStatusTodo] = React.useState("")
 
-
+  /**
+   * Handles the addition of a new todo item.
+   * Validates if the task and title are not empty.
+   * If title is empty, prompts the user to confirm adding the task without a title.
+   * If both title and task are empty, alerts the user.
+   */
   const handleAddTodo = () => {
     if (task.trim() !== "") {
       if (title.trim() !== "") {
+        // Add todo with provided details
         addTodo(
           title,
           task,
           selectedIteration,
+          "On going",
           selectedDependency,
-          selectedCategory
-        );
-        setTask("");
-        setTitle("");
-        setSelectedIteration(null);
-        setSelectedDependency(null);
-        setModalFormVisible(false);
-        setSelectedCategory("");
+          selectedCategory,
+        )
+        // Reset fields and hide modal form
+        setTask("")
+        setTitle("")
+        setSelectedIteration(null)
+        setSelectedDependency(null)
+        setModalFormVisible(false)
+        setSelectedCategory("")
       } else {
         // If the title is empty, prompt the user
         Alert.alert("Alert", "Do you want to add the task without a title?", [
@@ -64,48 +72,56 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo, totalPoints, update
           {
             text: "OK",
             onPress: () => {
+              // Add todo with empty title
               addTodo(
                 "",
                 task,
                 selectedIteration,
+                "On going",
                 selectedDependency,
                 selectedCategory
-              );
-              setTask("");
-              setTitle("");
-              setSelectedIteration(null);
-              setSelectedDependency(null);
-              setModalFormVisible(false);
+              )
+              // Reset fields and hide modal form
+              setTask("")
+              setTitle("")
+              setSelectedIteration(null)
+              setSelectedDependency(null)
+              setModalFormVisible(false)
             },
           },
         ])
       }
     } else {
       // If both fields are empty, show an alert
-      Alert.alert("Alert", "Task Name cannot be empty", [
-        {
-          text: "Cancel",
-          style: "cancel",
-        },
+      Alert.alert("Alert", "You have not entered a Task.", [
+        // {
+        //   text: "Cancel",
+        //   style: "cancel",
+        // },
         {
           text: "OK",
-          onPress: () => {
-            addTodo(
-              "",
-              task,
-              selectedIteration,
-              selectedDependency,
-              selectedCategory
-            );
-            setTask("");
-            setTitle("");
-            setSelectedDependency(null);
-            setModalFormVisible(false);
-          },
+          // onPress: () => {
+          //   // Add todo with empty title
+          //   addTodo(
+          //     "",
+          //     task,
+          //     selectedIteration,
+          //     statusTodo,
+          //     selectedDependency,
+          //     selectedCategory
+          //   )
+          //   // Reset fields and hide modal form
+          //   setTask("")
+          //   setTitle("")
+          //   setSelectedDependency(null)
+          //   setModalFormVisible(false)
+          // },
         },
       ])
+      return
     }
-  }
+  } // END OF handleAddTodo * * * * * * * * * * *
+
 
   // Function to handle updating a plan/task by its ID
   const handleupdateTodo = (id) => {
@@ -134,7 +150,8 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo, totalPoints, update
         },
       ])
     }
-  }
+  } // END OF handleupdateTodo * * * * * * * * * * * * *
+
 
   // Function to handle the deletion of a plan/task by its ID
   // Dispatch action to delete the plan/task with the given ID
@@ -160,7 +177,81 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo, totalPoints, update
         },
       ]
     )
-  }
+  } // END OF handleDeleteTodo * * * * * * * * * * *
+
+
+  const [statusMap, setStatusMap] = React.useState({})
+  const handleUpdateStatusTodo = (id, status) => {
+
+    try {
+      const currentTask = todo_list.find((task) => task.id === id)
+      // Assuming statusMap is defined elsewhere
+      let updatedStatusMap = { ...statusMap }
+      if (status === "Done") {
+        // Assuming currentTask is defined elsewhere
+        const dependentTask = currentTask.dependentTaskId
+        // if (dependentTask != null && dependentTask.value != null) {
+        if (dependentTask != null) {
+          if (dependentTask.value != null) {
+            if (statusMap.hasOwnProperty(dependentTask.value.toString())) {
+
+              // Create a new object reference with updated statusMap
+              updatedStatusMap = {
+                ...statusMap,
+                [id]: status,
+              }
+
+              const updatedPoints = totalPoints + 10
+              updateTotalPoints(updatedPoints)
+
+              // Update the statusMap state
+              setStatusMap(updatedStatusMap)
+              setModalUpdateVisible(false)
+
+            } else {
+              //if there is a dependency and status != done
+              Alert.alert("Alert", "The primary task must be completed first.", [
+                {
+                  text: "OK",
+                  onPress: () => {
+                    setModalUpdateVisible(false)
+                  },
+                },
+              ])
+              return // Exit early if dependency is not completed
+            }
+          }
+
+        }
+        // Call the updateStatusTodo function with the new status
+        updateStatusTodo(id, status)
+
+        updatedStatusMap = {
+          ...statusMap,
+          [id]: status,
+        }
+
+        const updatedPoints = totalPoints + 10
+        updateTotalPoints(updatedPoints)
+
+        setModalUpdateVisible(false)
+      } else {
+        updatedStatusMap = {
+          ...statusMap,
+          [id]: "Due",
+        }
+      }
+
+      const updatedPoints = totalPoints > 10 ? totalPoints - 10 : 0
+      updateTotalPoints(updatedPoints)
+
+      setStatusMap(updatedStatusMap)
+    } catch (error) {
+      console.error("Error updating task status:", error)
+    }
+
+  } // END OF handleUpdateStatusTodo * * * * * * * * * * *
+
 
   //get task list to the dropdown
   const generateDropdownData = (todoList) => {
@@ -172,9 +263,10 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo, totalPoints, update
     dropdownData.unshift({
       label: "No Dependency",
       value: null,
-    });
-    return dropdownData;
-  };
+    })
+    return dropdownData
+  } // END OF generateDropdownData * * * * * * * * * * *
+
 
   const generateCategoryDropdownData = () => {
     return [
@@ -189,132 +281,52 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo, totalPoints, update
       { label: "Hobbies", value: "Hobbies" },
       { label: "Travel", value: "Travel" },
       { label: "Entertainment", value: "Entertainment" },
-    ];
-  };
+    ]
+  } // END OF generateCategoryDropdownData * * * * * * * * * * *
+
 
   // Function to get the corresponding icon based on the selected category
   const getIconForCategory = (category) => {
-    const categoryValue = category?.value || "";
+    const categoryValue = category?.value || ""
     switch (categoryValue) {
       case "Work":
-        return "briefcase";
+        return "briefcase"
       case "Personal":
-        return "street-view";
+        return "street-view"
       case "School":
-        return "graduation-cap";
+        return "graduation-cap"
       case "Fitness":
-        return "bicycle";
+        return "bicycle"
       case "Health":
-        return "heartbeat";
+        return "heartbeat"
       case "Family":
-        return "users";
+        return "users"
       case "Finance":
-        return "dollar";
+        return "dollar"
       case "Home":
-        return "building-o";
+        return "building-o"
       case "Hobbies":
-        return "paint-brush";
+        return "paint-brush"
       case "Travel":
-        return "plane";
+        return "plane"
       case "Entertainment":
-        return "film";
+        return "film"
       default:
-        return "sticky-note";
+        return "sticky-note"
     }
-  };
+  } // END OF getIconForCategory * * * * * * * * * * *
+
 
   // Custom Icon Component
   const CustomIcon = ({ category, size, color }) => {
-    const iconName = getIconForCategory(category);
+    const iconName = getIconForCategory(category)
 
     return (
       <View style={{ flexDirection: "column", alignItems: "center" }}>
         <Icon name={iconName} size={size} color={color} />
       </View>
-    );
-  };
-
-  React.useEffect(() => {
-    const loadStatusMap = async () => {
-      try {
-        const statusMapString = await AsyncStorage.getItem("statusMap");
-        if (statusMapString !== null) {
-          setStatusMap(JSON.parse(statusMapString));
-        }
-      } catch (error) {
-        console.error("Error loading status map from AsyncStorage:", error);
-      }
-    };
-  
-    loadStatusMap();
-  }, []);
-  
-
-  const [statusMap, setStatusMap] = React.useState({});
-
-  const taskStat = async (id, stat) => {
-    try {
-      const currentTask = todo_list.find((task) => task.id === id)
-  
-      let updatedStatusMap
-  
-      if (stat === "Done") {
-        const dependentTask = currentTask.dependentTaskId
-        if (dependentTask != null) {
-          if (dependentTask.value != null) {
-            if (statusMap.hasOwnProperty(dependentTask.value.toString())) {
-              // Create a new object reference with updated statusMap
-              updatedStatusMap = {
-                ...statusMap,
-                [id]: stat,
-              }
-              // Update the statusMap state
-              setStatusMap(updatedStatusMap)
-
-              const updatedPoints = totalPoints + 10;
-              updateTotalPoints(updatedPoints);
-
-              setModalUpdateVisible(false)
-            } else {
-              //if there is a dependency and status != done
-              Alert.alert("Alert", "The primary task must be completed first.", [
-                {
-                  text: "OK",
-                },
-              ])
-              return // Exit early if dependency is not completed
-            }
-          }
-        }
-  
-        // If there is no dependency or dependency is completed
-        updatedStatusMap = {
-          ...statusMap,
-          [id]: stat,
-        }
-        const updatedPoints = totalPoints + 10;
-        updateTotalPoints(updatedPoints);
-        setModalUpdateVisible(false)
-      } else {
-        // Create a new object reference with updated statusMap
-        updatedStatusMap = {
-          ...statusMap,
-          [id]: "Due",
-        }
-      }
-  
-      const updatedPoints = totalPoints > 10 ? totalPoints - 10 : 0;
-      updateTotalPoints(updatedPoints);
-
-      // Update the statusMap state
-      setStatusMap(updatedStatusMap)
-  
-      // Save the updated statusMap to AsyncStorage
-      await AsyncStorage.setItem("statusMap", JSON.stringify(updatedStatusMap))
-    } catch (error) {
-      console.error("Error updating task status and saving to AsyncStorage:", error)
-    }
-  }
+    )
+  } // END OF CustomIcon * * * * * * * * * * *
 
 
   // Function to open the modal for updating a selected plan/task
@@ -331,25 +343,29 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo, totalPoints, update
     setModalUpdateVisible(true)
     // Set the mode of the modal
     setModalEditMode(true)
-  }
+  } // END OF openModal * * * * * * * * * * *
+
 
   // Function for Selected Iterations
   const handlePress = (option) => {
     setSelectedIteration(option)
     console.log("User selected iteration : ", option)
-  }
+  } // END OF handlePress * * * * * * * * * * *
+
 
   const filterClicked = () => {
     const filtered = todo_list.filter((task) => {
-      const status = statusMap[task.id] || "On going";
-      return status === _.get(filterType, "value");
-    });
-    setFilteredTasks(filtered);
-  }
+      const status = statusMap[task.id] || "On going"
+      return status === _.get(filterType, "value")
+    })
+    setFilteredTasks(filtered)
+  } // END OF filterClicked * * * * * * * * * * *
+
 
   const resetFilter = () => {
     setFilteredTasks([])
-  }
+  } // END OF filterClicked * * * * * * * * * * *
+
 
   return (
     <View style={styles.container}>
@@ -360,13 +376,11 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo, totalPoints, update
             data={filteredTasks.length > 0 ? filteredTasks : todo_list}
             keyExtractor={(item) => item.id}
             renderItem={({ item, index }) => {
-              const status = statusMap[item.id] || "On going"
+              const status = item.status
+              console.log(item.id, "STATUS : ", item.status)
               const cardTitle = (
-                <Text
-                  style={{ color: "black", fontWeight: "bold", fontSize: 20 }}
-                >
-                  {" "}
-                  {item.title || "[ No Title ]"}
+                <Text style={{ color: "black", fontWeight: "bold", fontSize: 20 }} >
+                  {" "} {item.title || "[ No Title ]"}
                 </Text>
               )
               const cardSubTitleColor = status === "Done" ? "green" : "gray"
@@ -382,28 +396,19 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo, totalPoints, update
               )
               const iconColor = status === "Done" ? "green" : "gray"
               const dependentOn = (
-                <Paragraph
-                  style={{ marginTop: 10, color: "tomato", fontSize: 12 }}
-                >
+                <Paragraph style={{ marginTop: 10, color: "tomato", fontSize: 12 }} >
                   {/* To Do = Imasha */}
                   Dependent on :{" "}
-                  {item.dependentTaskId != null
-                    ? item.dependentTaskId.label
-                    : "None"}
+                  {item.dependentTaskId != null ? item.dependentTaskId.label : "None"}
                 </Paragraph>
-              );
+              )
 
-              const period = item.iteration || "No Iteration Selected";
+              const period = item.iteration || "No Iteration Selected"
 
               const pointsLabel = (
                 <View style={styles.pointsContainer}>
                   <View style={styles.pointsCard}>
-                    <Icon
-                      name="trophy"
-                      size={20}
-                      color="tomato"
-                      style={{ padding: 3 }}
-                    />
+                    <Icon name="trophy" size={20} color="tomato" style={{ padding: 3 }} />
                     <Text style={styles.pointsText}>{item.points || 0}</Text>
                   </View>
                 </View>
@@ -413,71 +418,33 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo, totalPoints, update
                 <>
                   <Pressable key={item.id} onPress={() => openModal(item)}>
                     <Card style={{ width: 365, marginTop: 12, margin: 6 }}>
-                      <Card.Title
-                        title={<>{cardTitle}</>}
-                        subtitle={<>{cardSubTitle}</>}
-                        left={(props) => (
-                          <CustomIcon
-                            category={item.category}
-                            size={40}
-                            color={iconColor}
-                          />
-                        )}
+                      <Card.Title title={<>{cardTitle}</>} subtitle={<>{cardSubTitle}</>} left={(props) => (
+                        <CustomIcon category={item.category} size={30} color={iconColor} />
+                      )}
                         right={(props) => (
-                          <ButtonIcon
-                            iconName="close"
-                            color="red"
-                            onPress={() => handleDeleteTodo(item.id)}
-                          />
-                        )}
-                      />
+                          <ButtonIcon iconName="close" color="red" onPress={() => handleDeleteTodo(item.id)} />
+                        )} />
                       <Card.Content>
                         <Paragraph style={{ paddingTop: 5, paddingBottom: 5 }}>
                           {item.task}
                         </Paragraph>
-                        <View
-                          style={{
-                            flexDirection: "column",
-                            justifyContent: "start",
-                            gap: -5,
-                          }}
-                        >
+                        <View style={{ flexDirection: "column", justifyContent: "start",  }} >
                           {/* {dependentOn} */}
                           <View>{dependentOn}</View>
                           <View>
-                            <Text
-                              style={{
-                                marginTop: 12,
-                                color: "tomato",
-                                fontSize: 12,
-                              }}
-                            >
+                            <Text style={{ color: "tomato", fontSize: 12, }} >
                               Iteration : {period}
                             </Text>
                           </View>
                         </View>
 
-                        <Text
-                          style={{
-                            position: "absolute",
-                            bottom: -35,
-                            left: 15,
-                            color: "gray",
-                            fontSize: 12,
-                          }}
-                        >
+                        <Text style={{ position: "absolute", bottom: -35, left: 15, color: "gray", fontSize: 10, }} >
                           Tap to edit{" "}
                           <Icon name="pencil" size={12} color="gray" />
                         </Text>
                       </Card.Content>
                       {/* display points */}
-                      <Card.Actions
-                        style={{
-                          justifyContent: "flex-end",
-                          paddingRight: 10,
-                          paddingBottom: 10,
-                        }}
-                      >
+                      <Card.Actions style={{ justifyContent: "flex-end", paddingRight: 10, paddingBottom: 10, }} >
                         {pointsLabel}
                       </Card.Actions>
                     </Card>
@@ -489,10 +456,7 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo, totalPoints, update
         </View>
       </View>
       <View style={styles.buttonContainer}>
-        <Button
-          labelStyle={{ fontWeight: "bold", color: "white" }}
-          style={{ backgroundColor: "tomato" }}
-          onPress={() => {
+        <Button labelStyle={{ fontWeight: "bold", color: "white" }} style={{ backgroundColor: "tomato" }} onPress={() => {
             setModalFormVisible(true)
             setModalEditMode(false)
             setTitle("")
@@ -502,47 +466,29 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo, totalPoints, update
         >
           Create a Task
         </Button>
-        <Button
-          icon="filter"
-          mode="contained"
-          onPress={() => setFilterModalVisible(true)}
-          style={{ marginLeft: 10 }}
-        >
+        <Button icon="filter" mode="contained" style={{ marginLeft: 10 }} onPress={() => setFilterModalVisible(true)} >
           Filter
         </Button>
       </View>
 
       {/* Modal for filter tasks */}
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={filterModalVisible}
-      >
+      <Modal animationType="slide" transparent={true} visible={filterModalVisible} >
         <View style={styles.centeredView}>
           <View style={styles.filterModalView}>
             <View style={{ flexDirection: "row", marginBottom: 30 }}>
               <View style={{ flex: 1, flexDirection: "row" }}>
-                <Text
-                  style={[
-                    styles.modalTitle,
-                    { paddingLeft: 10, paddingTop: 3 },
-                  ]}
-                >
+                <Text style={[ styles.modalTitle, { paddingLeft: 10, paddingTop: 3 }, ]} >
                   Filter by status
                 </Text>
               </View>
               <View>
-                <Pressable
-                  onPress={() => setFilterModalVisible(!filterModalVisible)}
-                >
+                <Pressable onPress={() => setFilterModalVisible(!filterModalVisible)} >
                   <Icon name="close" size={24} color="red" />
                 </Pressable>
               </View>
             </View>
             <View style={{ paddingBottom: 10 }}>
-              <Dropdown
-                style={styles.dropdown}
-                label="No Dependency"
+              <Dropdown style={styles.dropdown} label="No Dependency"
                 data={[
                   { label: "On going", value: "On going" },
                   { label: "Done", value: "Done" },
@@ -550,18 +496,13 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo, totalPoints, update
                 value={filterType}
                 labelField="label"
                 valueField="value"
-                onChange={(value) => setSelectedFilterType(value)}
-              />
+                onChange={(value) => setSelectedFilterType(value)} />
             </View>
             <View style={styles.filterButtonsContainer}>
               <Button onPress={resetFilter}>
                 Reset Filter
               </Button>
-              <Button
-                mode="contained"
-                style={{ marginLeft: 10 }}
-                onPress={filterClicked}
-              >
+              <Button mode="contained" style={{ marginLeft: 10 }} onPress={filterClicked} >
                 Filter
               </Button>
             </View>
@@ -570,67 +511,40 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo, totalPoints, update
       </Modal>
 
       {/* Modal form for creating and updating tasks */}
-      <Modal
-        animationType="fade"
-        transparent={true}
-        visible={modalFormVisible || modalUpdateVisible}
+      <Modal animationType="fade" transparent={true} visible={modalFormVisible || modalUpdateVisible}
         onRequestClose={() => {
           setModalFormVisible(false)
           setModalUpdateVisible(false)
-        }}
-      >
+        }} >
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
             <View style={{ flexDirection: "row", marginBottom: 10 }}>
               <View style={{ flex: 1, flexDirection: "row" }}>
-                <CustomIcon name="sticky-note" size={25} color={"tomato"} />
-                <Text
-                  style={[
-                    styles.modalTitle,
-                    { paddingLeft: 10, paddingTop: 3 },
-                  ]}
-                >
+                <CustomIcon name="sticky-note" size={23} color={"tomato"} />
+                <Text style={[ styles.modalTitle, { paddingLeft: 10, paddingTop: 3 }, ]} >
                   {modalEditMode ? "Update Task" : "New Task"}
                 </Text>
               </View>
 
               <View>
-                <Pressable
-                  onPress={() => {
-                    setModalFormVisible(false), setModalUpdateVisible(false)
-                  }}
-                >
+                <Pressable onPress={() => { setModalFormVisible(false), setModalUpdateVisible(false) }} >
                   <Icon name="close" size={24} color="red" />
                 </Pressable>
               </View>
             </View>
             <View>
               <View>
-                <TextInput
-                  style={styles.txtInput}
-                  label="Title"
-                  value={modalEditMode ? modalTitle : title}
-                  onChangeText={(text) =>
-                    modalEditMode ? setModalTitle(text) : setTitle(text)
-                  }
-                />
-                <TextInput
-                  style={styles.txtInput}
-                  label="Task"
-                  value={modalEditMode ? modalTask : task}
-                  onChangeText={(text) =>
-                    modalEditMode ? setModalTask(text) : setTask(text)
-                  }
-                />
+                <TextInput style={styles.txtInput} label="Title" value={modalEditMode ? modalTitle : title}
+                 onChangeText={(text) => modalEditMode ? setModalTitle(text) : setTitle(text) } />
+                <TextInput style={styles.txtInput} label="Task" value={modalEditMode ? modalTask : task}
+                  onChangeText={(text) => modalEditMode ? setModalTask(text) : setTask(text) } />
               </View>
               {!modalEditMode && (
                 <View>
                   <View style={styles.separator}></View>
                   <Text style={styles.label}>Select Iteration</Text>
                   <View style={{ flexDirection: "row" }}>
-                    <Pressable
-                      style={({ pressed }) => [
-                        styles.iterationPress,
+                    <Pressable style={({ pressed }) => [styles.iterationPress,
                         selectedIteration === "Once" ? styles.selected : null,
                         {
                           backgroundColor: pressed
@@ -640,16 +554,13 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo, totalPoints, update
                               : "lightgray",
                         },
                       ]}
-                      onPress={() => handlePress("Once")}
-                    >
+                      onPress={() => handlePress("Once")} >
                       <Text style={{ fontWeight: "bold", color: "white" }}>
                         Once
                       </Text>
                     </Pressable>
 
-                    <Pressable
-                      style={({ pressed }) => [
-                        styles.iterationPress,
+                    <Pressable style={({ pressed }) => [styles.iterationPress,
                         selectedIteration === "Daily" ? styles.selected : null,
                         {
                           backgroundColor: pressed
@@ -659,16 +570,13 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo, totalPoints, update
                               : "lightgray",
                         },
                       ]}
-                      onPress={() => handlePress("Daily")}
-                    >
+                      onPress={() => handlePress("Daily")} >
                       <Text style={{ fontWeight: "bold", color: "white" }}>
                         Daily
                       </Text>
                     </Pressable>
 
-                    <Pressable
-                      style={({ pressed }) => [
-                        styles.iterationPress,
+                    <Pressable style={({ pressed }) => [styles.iterationPress,
                         selectedIteration === "Weekly" ? styles.selected : null,
                         {
                           backgroundColor: pressed
@@ -678,16 +586,13 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo, totalPoints, update
                               : "lightgray",
                         },
                       ]}
-                      onPress={() => handlePress("Weekly")}
-                    >
+                      onPress={() => handlePress("Weekly")} >
                       <Text style={{ fontWeight: "bold", color: "white" }}>
                         Weekly
                       </Text>
                     </Pressable>
 
-                    <Pressable
-                      style={({ pressed }) => [
-                        styles.iterationPress,
+                    <Pressable style={({ pressed }) => [ styles.iterationPress,
                         selectedIteration === "Monthly"
                           ? styles.selected
                           : null,
@@ -698,9 +603,7 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo, totalPoints, update
                               ? "tomato"
                               : "lightgray",
                         },
-                      ]}
-                      onPress={() => handlePress("Monthly")}
-                    >
+                      ]} onPress={() => handlePress("Monthly")} >
                       <Text style={{ fontWeight: "bold", color: "white" }}>
                         Monthly
                       </Text>
@@ -746,16 +649,18 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo, totalPoints, update
                   <Button
                     labelStyle={{ fontWeight: "bold", color: "white" }}
                     style={{ backgroundColor: "green" }}
-                    onPress={() => taskStat(selectedItem.id, "Done")}
+                    onPress={() => {
+                      handleUpdateStatusTodo(selectedItem.id, "Done")
+                      console.log("SELECTED : ", selectedItem.id)
+                    }}
+
                   >
                     <Text> Done Task </Text>
                   </Button>
                 </View>
               )}
               <View style={{ flex: 1 }}>
-                <Button
-                  style={{ alignSelf: "center" }}
-                  icon={modalEditMode ? "note" : "note-plus"}
+                <Button style={{ alignSelf: "center" }} icon={modalEditMode ? "note" : "note-plus"}
                   onPress={() =>
                     modalEditMode
                       ? handleupdateTodo(selectedItem.id)
@@ -769,6 +674,7 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo, totalPoints, update
           </View>
         </View>
       </Modal>
+
     </View>
   )
 }
@@ -910,6 +816,6 @@ const mapStateToProps = (state, ownProps) => {
   }
 }
 
-const mapDispatchToProps = { addTodo, deleteTodo, updateTodo, updateTotalPoints }
+const mapDispatchToProps = { addTodo, deleteTodo, updateTodo, updateTotalPoints, updateStatusTodo }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Tasks)
