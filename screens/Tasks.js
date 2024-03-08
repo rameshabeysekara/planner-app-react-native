@@ -279,20 +279,21 @@ const Tasks = ({
               };
               // Update the statusMap state
               setStatusMap(updatedStatusMap);
+              
 
               setModalUpdateVisible(false);
             } else {
               //if there is a dependency and status != done
               Alert.alert(
-                "Alert",
-                "The primary task must be completed first.",
+                "Dependency Alert",
+                  `Completion of the task "${dependentTask.label}" is required before proceeding.`,
                 [
                   {
                     text: "OK",
                   },
                 ]
               );
-              return; // Exit early if dependency is not completed
+              return;
             }
           }
         }
@@ -320,6 +321,17 @@ const Tasks = ({
 
       // Update the statusMap state
       setStatusMap(updatedStatusMap);
+
+       // Display congratulations alert
+            Alert.alert(
+              "Whoops 🥳",
+              `Task "${currentTask.title}" completed! You get 10 points 🎉`,
+              [
+                {
+                  text: "OK",
+                },
+              ]
+            );
 
       // Save the updated statusMap to AsyncStorage
       await AsyncStorage.setItem("statusMap", JSON.stringify(updatedStatusMap));
@@ -757,15 +769,13 @@ const Tasks = ({
               {modalEditMode && (
                 <View style={{ flex: 1 }}>
                   <Button
-                    labelStyle={{ fontWeight: "bold", color: "white" }}
-                    style={{ backgroundColor: "green" }}
-                    onPress={
-                      () => 
-                      {
-                        taskStat(selectedItem.id, "Done")
-                      }
-                      
-                    }
+                    //labelStyle={{ fontWeight: "bold", color: "white" }}
+                    //style={{ backgroundColor: "green" }}
+                    mode="contained"
+                    onPress={() => {
+                      taskStat(selectedItem.id, "Done");
+                    }}
+                    disabled={statusMap[selectedItem.id] === "Done"}
                   >
                     <Text> Done Task </Text>
                   </Button>
