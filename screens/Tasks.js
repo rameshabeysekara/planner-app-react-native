@@ -760,7 +760,15 @@ const Tasks = ({
                   <Button
                     labelStyle={{ fontWeight: "bold", color: "white" }}
                     style={{ backgroundColor: "green" }}
-                    onPress={() => taskStat(selectedItem.id, "Done")}
+                    onPress={
+                      () => 
+                      {
+                        taskStat(selectedItem.id, "Done")
+                        const updatedPoints = totalPoints + 10
+                        updateTotalPoints(updatedPoints)
+                      }
+                      
+                    }
                   >
                     <Text> Done Task </Text>
                   </Button>
