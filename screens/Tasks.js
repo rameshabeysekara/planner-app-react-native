@@ -280,9 +280,6 @@ const Tasks = ({
               // Update the statusMap state
               setStatusMap(updatedStatusMap);
 
-              const updatedPoints = totalPoints + 10;
-              updateTotalPoints(updatedPoints);
-
               setModalUpdateVisible(false);
             } else {
               //if there is a dependency and status != done
@@ -300,24 +297,26 @@ const Tasks = ({
           }
         }
 
+        const updatedPoints = totalPoints + 10;
+        updateTotalPoints(updatedPoints);
+
         // If there is no dependency or dependency is completed
         updatedStatusMap = {
           ...statusMap,
           [id]: stat,
         };
-        const updatedPoints = totalPoints + 10;
-        updateTotalPoints(updatedPoints);
+
+        
         setModalUpdateVisible(false);
       } else {
+        const updatedPoints = totalPoints > 10 ? totalPoints - 10 : 0;
+        updateTotalPoints(updatedPoints);
         // Create a new object reference with updated statusMap
         updatedStatusMap = {
           ...statusMap,
           [id]: "Due",
         };
       }
-
-      const updatedPoints = totalPoints > 10 ? totalPoints - 10 : 0;
-      updateTotalPoints(updatedPoints);
 
       // Update the statusMap state
       setStatusMap(updatedStatusMap);
@@ -764,8 +763,6 @@ const Tasks = ({
                       () => 
                       {
                         taskStat(selectedItem.id, "Done")
-                        const updatedPoints = totalPoints + 10
-                        updateTotalPoints(updatedPoints)
                       }
                       
                     }
