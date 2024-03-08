@@ -9,7 +9,7 @@ const ActivityLog = ({ activityLog }) => {
       {activityLog.map((item, index) => (
         <ListItem key={index} bottomDivider containerStyle={{ width: '100%' }}>
           <ListItem.Content>
-            <ListItem.Title style={{ color: getTaskTypeColor(item.type) }}>{item.type}</ListItem.Title>
+            <ListItem.Title style={{ color: "tomato"}}>{item.type}</ListItem.Title>
             <ListItem.Subtitle>{`Title: ${item.title}`}</ListItem.Subtitle>
             <ListItem.Subtitle>{`Task: ${item.task}`}</ListItem.Subtitle>
           </ListItem.Content>
@@ -20,18 +20,18 @@ const ActivityLog = ({ activityLog }) => {
 };
 
 
-const getTaskTypeColor = (type) => {
-  switch (type) {
-    case 'Updated Task':
-      return 'orange'; // Color for updated tasks
-    case 'Added Task':
-      return 'green'; // Color for added tasks
-    case 'Deleted Task':
-      return 'red'; // Color for deleted tasks
-    default:
-      return 'black'; // Default color if the type doesn't match any of the cases
-  }
-};
+// const getTaskTypeColor = (type) => {
+//   switch (type) {
+//     case 'Updated Task':
+//       return 'orange'; // Color for updated tasks
+//     case 'Added Task':
+//       return 'green'; // Color for added tasks
+//     case 'Deleted Task':
+//       return 'red'; // Color for deleted tasks
+//     default:
+//       return 'black'; // Default color if the type doesn't match any of the cases
+//   }
+// };
 
 
 const mapStateToProps = (state) => {

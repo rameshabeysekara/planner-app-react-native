@@ -287,15 +287,15 @@ const Tasks = ({
             } else {
               //if there is a dependency and status != done
               Alert.alert(
-                "Alert",
-                "The primary task must be completed first.",
+                "Dependency Alert",
+                  `Completion of the task "${dependentTask.label}" is required before proceeding.`,
                 [
                   {
                     text: "OK",
                   },
                 ]
               );
-              return; // Exit early if dependency is not completed
+              return;
             }
           }
         }
