@@ -3,6 +3,7 @@ import {
   DELETE_TODO,
   UPDATE_TODO,
   ADD_TO_ACTIVITY_LOG,
+  UPDATE_TOTAL_POINTS
 } from "./actionTypes";
 import uuid from "react-native-uuid";
 
@@ -26,4 +27,9 @@ export const deleteTodo = (id) => ({
 export const addToActivityLog = (log) => ({
   type: ADD_TO_ACTIVITY_LOG,
   payload: log,
+});
+
+export const updateTotalPoints = (points) => ({
+  type: UPDATE_TOTAL_POINTS,
+  payload: points,
 });

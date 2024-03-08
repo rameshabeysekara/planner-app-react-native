@@ -16,9 +16,23 @@ import { Dropdown } from "react-native-element-dropdown";
 import { Button, TextInput, Card, Paragraph } from "react-native-paper";
 import { FontAwesome as Icon } from "@expo/vector-icons";
 import { connect } from "react-redux";
-import { addTodo, deleteTodo, updateTodo } from "../redux/actions";
+import {
+  addTodo,
+  deleteTodo,
+  updateTodo,
+  updateTotalPoints,
+} from "../redux/actions";
 
-const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+const Tasks = ({
+  todo_list,
+  addTodo,
+  deleteTodo,
+  updateTodo,
+  totalPoints,
+  updateTotalPoints,
+}) => {
   const [modalFormVisible, setModalFormVisible] = React.useState(false);
   const [title, setTitle] = React.useState("");
   const [task, setTask] = React.useState("");
@@ -30,20 +44,26 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
   const [modalUpdateVisible, setModalUpdateVisible] = React.useState(false);
   const [selectedIteration, setSelectedIteration] = React.useState(null);
   const [filterModalVisible, setFilterModalVisible] = React.useState(false);
-  const [filterType, setSelectedFilterType] = React.useState("On going");
+  const [filterType, setSelectedFilterType] = React.useState(null);
   const [filteredTasks, setFilteredTasks] = React.useState([]);
   const [selectedCategory, setSelectedCategory] = React.useState("");
 
   const handleAddTodo = () => {
     if (task.trim() !== "") {
       if (title.trim() !== "") {
-        addTodo(title, task, selectedIteration, selectedDependency, selectedCategory);
+        addTodo(
+          title,
+          task,
+          selectedIteration,
+          selectedDependency,
+          selectedCategory
+        );
         setTask("");
         setTitle("");
         setSelectedIteration(null);
         setSelectedDependency(null);
         setModalFormVisible(false);
-        setSelectedCategory("")
+        setSelectedCategory("");
       } else {
         // If the title is empty, prompt the user
         Alert.alert("Alert", "Do you want to add the task without a title?", [
@@ -54,7 +74,13 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
           {
             text: "OK",
             onPress: () => {
-              addTodo("", task, selectedIteration, selectedDependency, selectedCategory);
+              addTodo(
+                "",
+                task,
+                selectedIteration,
+                selectedDependency,
+                selectedCategory
+              );
               setTask("");
               setTitle("");
               setSelectedIteration(null);
@@ -74,7 +100,13 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
         {
           text: "OK",
           onPress: () => {
-            addTodo("", task, selectedIteration, selectedDependency, selectedCategory);
+            addTodo(
+              "",
+              task,
+              selectedIteration,
+              selectedDependency,
+              selectedCategory
+            );
             setTask("");
             setTitle("");
             setSelectedDependency(null);
@@ -155,117 +187,159 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo }) => {
   };
 
   const generateCategoryDropdownData = () => {
-  return [
-    { label: 'Work', value: 'Work' },
-    { label: 'Personal', value: 'Personal' },
-    { label: 'School', value: 'School' },
-    { label: 'Fitness', value: 'Fitness' },
-    { label: 'Health', value: 'Health' },
-    { label: 'Family', value: 'Family' },
-    { label: 'Finance', value: 'Finance' },
-    { label: 'Home', value: 'Home' },
-    { label: 'Hobbies', value: 'Hobbies' },
-    { label: 'Travel', value: 'Travel' },
-    { label: 'Entertainment', value: 'Entertainment' },
-  ];
-};
+    return [
+      { label: "Work", value: "Work" },
+      { label: "Personal", value: "Personal" },
+      { label: "School", value: "School" },
+      { label: "Fitness", value: "Fitness" },
+      { label: "Health", value: "Health" },
+      { label: "Family", value: "Family" },
+      { label: "Finance", value: "Finance" },
+      { label: "Home", value: "Home" },
+      { label: "Hobbies", value: "Hobbies" },
+      { label: "Travel", value: "Travel" },
+      { label: "Entertainment", value: "Entertainment" },
+    ];
+  };
 
   // Function to get the corresponding icon based on the selected category
- const getIconForCategory = (category) => {
-  const categoryValue = category?.value || '';
-  switch (categoryValue) {
-    case 'Work':
-      return 'briefcase';
-    case 'Personal':
-      return 'street-view';
-    case 'School':
-      return 'graduation-cap';
-    case 'Fitness':
-      return 'bicycle';
-    case 'Health':
-      return 'heartbeat';
-    case 'Family':
-      return 'users';
-    case 'Finance':
-      return 'dollar';
-    case 'Home':
-      return 'building-o';
-    case 'Hobbies':
-      return 'paint-brush';
-    case 'Travel':
-      return 'plane';
-    case 'Entertainment':
-      return 'film';
-    default:
-      return 'sticky-note';
-  }
-};
-
+  const getIconForCategory = (category) => {
+    const categoryValue = category?.value || "";
+    switch (categoryValue) {
+      case "Work":
+        return "briefcase";
+      case "Personal":
+        return "street-view";
+      case "School":
+        return "graduation-cap";
+      case "Fitness":
+        return "bicycle";
+      case "Health":
+        return "heartbeat";
+      case "Family":
+        return "users";
+      case "Finance":
+        return "dollar";
+      case "Home":
+        return "building-o";
+      case "Hobbies":
+        return "paint-brush";
+      case "Travel":
+        return "plane";
+      case "Entertainment":
+        return "film";
+      default:
+        return "sticky-note";
+    }
+  };
 
   // Custom Icon Component
-const CustomIcon = ({ category, size, color }) => {
-  const iconName = getIconForCategory(category);
+  const CustomIcon = ({ category, size, color }) => {
+    const iconName = getIconForCategory(category);
 
-  return (
-    <View style={{ flexDirection: "column", alignItems: "center" }}>
-      <Icon name={iconName} size={size} color={color} />
-    </View>
-  );
-};
+    return (
+      <View style={{ flexDirection: "column", alignItems: "center" }}>
+        <Icon name={iconName} size={size} color={color} />
+      </View>
+    );
+  };
 
+  React.useEffect(() => {
+    const loadStatusMap = async () => {
+      try {
+        const statusMapString = await AsyncStorage.getItem("statusMap");
+        if (statusMapString !== null) {
+          setStatusMap(JSON.parse(statusMapString));
+        }
+      } catch (error) {
+        console.error("Error loading status map from AsyncStorage:", error);
+      }
+    };
+
+    loadStatusMap();
+  }, []);
 
   const [statusMap, setStatusMap] = React.useState({});
 
-  const taskStat = (id, stat) => {
-    const currentTask = todo_list.find((task) => task.id === id);
+  const taskStat = async (id, stat) => {
+    try {
+      const currentTask = todo_list.find((task) => task.id === id);
 
-    if (stat === "Done") {
-      const dependentTask = currentTask.dependentTaskId;
-      if (dependentTask != null) {
-        if (dependentTask.value != null) {
-          if (statusMap.hasOwnProperty(dependentTask.value.toString())) {
-            // Create a new object reference with updated statusMap
-            const updatedStatusMap = {
-              ...statusMap,
-              [id]: stat,
-            };
-            // Update the statusMap state
-            setStatusMap(updatedStatusMap);
-            setModalUpdateVisible(false);
-          } else {
-            //if there is a dependency and status != done
-            Alert.alert("Alert", "The primary task must be completed first.", [
-              {
-                text: "OK",
-              },
-            ]);
+      let updatedStatusMap;
+
+      if (stat === "Done") {
+        const dependentTask = currentTask.dependentTaskId;
+        if (dependentTask != null) {
+          if (dependentTask.value != null) {
+            if (statusMap.hasOwnProperty(dependentTask.value.toString())) {
+              // Create a new object reference with updated statusMap
+              updatedStatusMap = {
+                ...statusMap,
+                [id]: stat,
+              };
+              // Update the statusMap state
+              setStatusMap(updatedStatusMap);
+              
+
+              setModalUpdateVisible(false);
+            } else {
+              //if there is a dependency and status != done
+              Alert.alert(
+                "Dependency Alert",
+                  `Completion of the task "${dependentTask.label}" is required before proceeding.`,
+                [
+                  {
+                    text: "OK",
+                  },
+                ]
+              );
+              return;
+            }
           }
-        } else {
-          //if there is no dependency
-          const updatedStatusMap = {
-            ...statusMap,
-            [id]: stat,
-          };
-          setStatusMap(updatedStatusMap);
-          setModalUpdateVisible(false);
         }
-      } else {
-        //if there is no dependency
-        const updatedStatusMap = {
+
+        const updatedPoints = totalPoints + 10;
+        updateTotalPoints(updatedPoints);
+
+        // If there is no dependency or dependency is completed
+        updatedStatusMap = {
           ...statusMap,
           [id]: stat,
         };
-        setStatusMap(updatedStatusMap);
+
+        
         setModalUpdateVisible(false);
+      } else {
+        const updatedPoints = totalPoints > 10 ? totalPoints - 10 : 0;
+        updateTotalPoints(updatedPoints);
+        // Create a new object reference with updated statusMap
+        updatedStatusMap = {
+          ...statusMap,
+          [id]: "Due",
+        };
       }
-    } else {
-      // Create a new object reference with updated statusMap
-      const updatedStatusMap = {
-        ...statusMap,
-        [id]: "Due",
-      };
+
       // Update the statusMap state
       setStatusMap(updatedStatusMap);
+
+       // Display congratulations alert
+            Alert.alert(
+              "Whoops 🥳",
+              `Task "${currentTask.title}" completed! You get 10 points 🎉`,
+              [
+                {
+                  text: "OK",
+                },
+              ]
+            );
+
+      // Save the updated statusMap to AsyncStorage
+      await AsyncStorage.setItem("statusMap", JSON.stringify(updatedStatusMap));
+    } catch (error) {
+      console.error(
+        "Error updating task status and saving to AsyncStorage:",
+        error
+      );
     }
   };
 
@@ -292,11 +366,10 @@ const CustomIcon = ({ category, size, color }) => {
   };
 
   const filterClicked = () => {
-    console.log("list:", todo_list, filterType);
-    console.log("statusMap:", statusMap);
-    const filtered = todo_list.filter(
-      (task) => statusMap[task.id] === _.get(filterType, "value")
-    );
+    const filtered = todo_list.filter((task) => {
+      const status = statusMap[task.id] || "On going";
+      return status === _.get(filterType, "value");
+    });
     setFilteredTasks(filtered);
   };
 
@@ -316,7 +389,7 @@ const CustomIcon = ({ category, size, color }) => {
               const status = statusMap[item.id] || "On going";
               const cardTitle = (
                 <Text
-                  style={{ color: "black", fontWeight: "bold", fontSize: 20, }}
+                  style={{ color: "black", fontWeight: "bold", fontSize: 20 }}
                 >
                   {" "}
                   {item.title || "[ No Title ]"}
@@ -371,10 +444,10 @@ const CustomIcon = ({ category, size, color }) => {
                         subtitle={<>{cardSubTitle}</>}
                         left={(props) => (
                           <CustomIcon
-                          category={item.category} 
-                          size={40}
-                          color={iconColor}
-                        />
+                            category={item.category}
+                            size={40}
+                            color={iconColor}
+                          />
                         )}
                         right={(props) => (
                           <ButtonIcon
@@ -392,8 +465,9 @@ const CustomIcon = ({ category, size, color }) => {
                           style={{
                             flexDirection: "column",
                             justifyContent: "start",
-                            gap: -5
-                          }}>
+                            gap: -5,
+                          }}
+                        >
                           {/* {dependentOn} */}
                           <View>{dependentOn}</View>
                           <View>
@@ -408,8 +482,16 @@ const CustomIcon = ({ category, size, color }) => {
                             </Text>
                           </View>
                         </View>
-                        
-                        <Text style={{ position: "absolute", bottom: -35, left: 15, color: "gray", fontSize: 12 }}>
+
+                        <Text
+                          style={{
+                            position: "absolute",
+                            bottom: -35,
+                            left: 15,
+                            color: "gray",
+                            fontSize: 12,
+                          }}
+                        >
                           Tap to edit{" "}
                           <Icon name="pencil" size={12} color="gray" />
                         </Text>
@@ -464,9 +546,25 @@ const CustomIcon = ({ category, size, color }) => {
       >
         <View style={styles.centeredView}>
           <View style={styles.filterModalView}>
-            <Text style={[styles.modalTitle, { paddingBottom: 10 }]}>
-              Filter by status
-            </Text>
+            <View style={{ flexDirection: "row", marginBottom: 30 }}>
+              <View style={{ flex: 1, flexDirection: "row" }}>
+                <Text
+                  style={[
+                    styles.modalTitle,
+                    { paddingLeft: 10, paddingTop: 3 },
+                  ]}
+                >
+                  Filter by status
+                </Text>
+              </View>
+              <View>
+                <Pressable
+                  onPress={() => setFilterModalVisible(!filterModalVisible)}
+                >
+                  <Icon name="close" size={24} color="red" />
+                </Pressable>
+              </View>
+            </View>
             <View style={{ paddingBottom: 10 }}>
               <Dropdown
                 style={styles.dropdown}
@@ -482,18 +580,12 @@ const CustomIcon = ({ category, size, color }) => {
               />
             </View>
             <View style={styles.filterButtonsContainer}>
-              <Button
-                onPress={() => setFilterModalVisible(!filterModalVisible)}
-              >
-                Close
-              </Button>
-              <Button mode="contained" onPress={resetFilter}>
-                Reset Filter
-              </Button>
+              <Button onPress={resetFilter}>Reset Filter</Button>
               <Button
                 mode="contained"
                 style={{ marginLeft: 10 }}
                 onPress={filterClicked}
+                disabled={filterType == null}
               >
                 Filter
               </Button>
@@ -677,9 +769,13 @@ const CustomIcon = ({ category, size, color }) => {
               {modalEditMode && (
                 <View style={{ flex: 1 }}>
                   <Button
-                    labelStyle={{ fontWeight: "bold", color: "white" }}
-                    style={{ backgroundColor: "green" }}
-                    onPress={() => taskStat(selectedItem.id, "Done")}
+                    //labelStyle={{ fontWeight: "bold", color: "white" }}
+                    //style={{ backgroundColor: "green" }}
+                    mode="contained"
+                    onPress={() => {
+                      taskStat(selectedItem.id, "Done");
+                    }}
+                    disabled={statusMap[selectedItem.id] === "Done"}
                   >
                     <Text> Done Task </Text>
                   </Button>
@@ -807,6 +903,7 @@ const styles = StyleSheet.create({
   filterButtonsContainer: {
     flexDirection: "row",
     alignSelf: "center",
+    paddingTop: 20,
   },
   pointsContainer: {
     flexDirection: "row",
@@ -838,9 +935,15 @@ const styles = StyleSheet.create({
 const mapStateToProps = (state, ownProps) => {
   return {
     todo_list: state.todos.todo_list,
+    totalPoints: state.todos.totalPoints,
   };
 };
 
-const mapDispatchToProps = { addTodo, deleteTodo, updateTodo };
+const mapDispatchToProps = {
+  addTodo,
+  deleteTodo,
+  updateTodo,
+  updateTotalPoints,
+};
 
 export default connect(mapStateToProps, mapDispatchToProps)(Tasks);
