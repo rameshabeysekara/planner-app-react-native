@@ -279,6 +279,16 @@ const Tasks = ({
               };
               // Update the statusMap state
               setStatusMap(updatedStatusMap);
+              
+              Alert.alert(
+                        "Whoops 🥳",
+                          `Congratulations on completing this task, you get 10 points 🥳`,
+                        [
+                          {
+                            text: "OK",
+                          },
+                        ]
+                );
 
               const updatedPoints = totalPoints + 10;
               updateTotalPoints(updatedPoints);
@@ -321,6 +331,17 @@ const Tasks = ({
 
       // Update the statusMap state
       setStatusMap(updatedStatusMap);
+
+       // Display congratulations alert
+            Alert.alert(
+              "Congratulations 🥳",
+              `Task "${currentTask.title}" completed! You get 10 points 🎉`,
+              [
+                {
+                  text: "OK",
+                },
+              ]
+            );
 
       // Save the updated statusMap to AsyncStorage
       await AsyncStorage.setItem("statusMap", JSON.stringify(updatedStatusMap));
@@ -765,15 +786,7 @@ const Tasks = ({
                       taskStat(selectedItem.id, "Done");
                       const updatedPoints = totalPoints + 10;
                       updateTotalPoints(updatedPoints);
-                      Alert.alert(
-                        "Whoops 🥳",
-                          `Congratulations on completing this task, you get 10 points 🥳`,
-                        [
-                          {
-                            text: "OK",
-                          },
-                        ]
-                      );
+                      
                       
                     }}
                     disabled={statusMap[selectedItem.id] === "Done"}
