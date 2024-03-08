@@ -280,15 +280,6 @@ const Tasks = ({
               // Update the statusMap state
               setStatusMap(updatedStatusMap);
               
-              Alert.alert(
-                        "Whoops 🥳",
-                          `Congratulations on completing this task, you get 10 points 🥳`,
-                        [
-                          {
-                            text: "OK",
-                          },
-                        ]
-                );
 
               const updatedPoints = totalPoints + 10;
               updateTotalPoints(updatedPoints);
@@ -334,7 +325,7 @@ const Tasks = ({
 
        // Display congratulations alert
             Alert.alert(
-              "Congratulations 🥳",
+              "Whoops 🥳",
               `Task "${currentTask.title}" completed! You get 10 points 🎉`,
               [
                 {
