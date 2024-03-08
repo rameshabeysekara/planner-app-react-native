@@ -377,6 +377,7 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo, totalPoints, update
             keyExtractor={(item) => item.id}
             renderItem={({ item, index }) => {
               const status = item.status
+              console.log(item.id, "STATUS : ", item.status)
               const cardTitle = (
                 <Text style={{ color: "black", fontWeight: "bold", fontSize: 20 }} >
                   {" "} {item.title || "[ No Title ]"}
