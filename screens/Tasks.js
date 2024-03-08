@@ -758,17 +758,15 @@ const Tasks = ({
               {modalEditMode && (
                 <View style={{ flex: 1 }}>
                   <Button
-                    labelStyle={{ fontWeight: "bold", color: "white" }}
-                    style={{ backgroundColor: "green" }}
-                    onPress={
-                      () => 
-                      {
-                        taskStat(selectedItem.id, "Done")
-                        const updatedPoints = totalPoints + 10
-                        updateTotalPoints(updatedPoints)
-                      }
-                      
-                    }
+                    //labelStyle={{ fontWeight: "bold", color: "white" }}
+                    //style={{ backgroundColor: "green" }}
+                    mode="contained"
+                    onPress={() => {
+                      taskStat(selectedItem.id, "Done");
+                      const updatedPoints = totalPoints + 10;
+                      updateTotalPoints(updatedPoints);
+                    }}
+                    disabled={statusMap[selectedItem.id] === "Done"}
                   >
                     <Text> Done Task </Text>
                   </Button>
