@@ -766,7 +766,7 @@ const Tasks = ({
                       const updatedPoints = totalPoints + 10;
                       updateTotalPoints(updatedPoints);
                       Alert.alert(
-                        "Whoops",
+                        "Whoops 🥳",
                           `Congratulations on completing this task, you get 10 points 🥳`,
                         [
                           {
