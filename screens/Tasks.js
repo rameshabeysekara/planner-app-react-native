@@ -765,6 +765,16 @@ const Tasks = ({
                       taskStat(selectedItem.id, "Done");
                       const updatedPoints = totalPoints + 10;
                       updateTotalPoints(updatedPoints);
+                      Alert.alert(
+                        "Whoops",
+                          `Congratulations on completing this task, you get 10 points 🥳`,
+                        [
+                          {
+                            text: "OK",
+                          },
+                        ]
+                      );
+                      
                     }}
                     disabled={statusMap[selectedItem.id] === "Done"}
                   >
