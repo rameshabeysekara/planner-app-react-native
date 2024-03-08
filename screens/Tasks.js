@@ -1,8 +1,8 @@
-import React from "react"
-import ButtonIcon from "../components/ButtonIcon"
-import Spacer from "../components/Spacer"
-import Constants from "expo-constants"
-import _ from "lodash"
+import React from "react";
+import ButtonIcon from "../components/ButtonIcon";
+import Spacer from "../components/Spacer";
+import Constants from "expo-constants";
+import _ from "lodash";
 import {
   Text,
   View,
@@ -11,17 +11,28 @@ import {
   FlatList,
   Pressable,
   Alert,
-} from "react-native"
-import { Dropdown } from "react-native-element-dropdown"
-import { Button, TextInput, Card, Paragraph } from "react-native-paper"
-import { FontAwesome as Icon } from "@expo/vector-icons"
-import { connect } from "react-redux"
-import { addTodo, deleteTodo, updateTodo, updateTotalPoints } from "../redux/actions"
+} from "react-native";
+import { Dropdown } from "react-native-element-dropdown";
+import { Button, TextInput, Card, Paragraph } from "react-native-paper";
+import { FontAwesome as Icon } from "@expo/vector-icons";
+import { connect } from "react-redux";
+import {
+  addTodo,
+  deleteTodo,
+  updateTodo,
+  updateTotalPoints,
+} from "../redux/actions";
 
-import AsyncStorage from "@react-native-async-storage/async-storage"
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-
-const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo, totalPoints, updateTotalPoints }) => {
+const Tasks = ({
+  todo_list,
+  addTodo,
+  deleteTodo,
+  updateTodo,
+  totalPoints,
+  updateTotalPoints,
+}) => {
   const [modalFormVisible, setModalFormVisible] = React.useState(false);
   const [title, setTitle] = React.useState("");
   const [task, setTask] = React.useState("");
@@ -33,10 +44,9 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo, totalPoints, update
   const [modalUpdateVisible, setModalUpdateVisible] = React.useState(false);
   const [selectedIteration, setSelectedIteration] = React.useState(null);
   const [filterModalVisible, setFilterModalVisible] = React.useState(false);
-  const [filterType, setSelectedFilterType] = React.useState("On going");
+  const [filterType, setSelectedFilterType] = React.useState(null);
   const [filteredTasks, setFilteredTasks] = React.useState([]);
   const [selectedCategory, setSelectedCategory] = React.useState("");
-
 
   const handleAddTodo = () => {
     if (task.trim() !== "") {
@@ -78,7 +88,7 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo, totalPoints, update
               setModalFormVisible(false);
             },
           },
-        ])
+        ]);
       }
     } else {
       // If both fields are empty, show an alert
@@ -103,18 +113,18 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo, totalPoints, update
             setModalFormVisible(false);
           },
         },
-      ])
+      ]);
     }
-  }
+  };
 
   // Function to handle updating a plan/task by its ID
   const handleupdateTodo = (id) => {
     // Check if the title is not empty
     if (modalTitle.trim() !== "") {
       // If title is not empty, update the plan/task with the provided ID, title, and task
-      updateTodo(id, modalTitle, modalTask, selectedDependency)
+      updateTodo(id, modalTitle, modalTask, selectedDependency);
       // Hide the update modal
-      setModalUpdateVisible(false)
+      setModalUpdateVisible(false);
     } else {
       // If title is empty, prompt the user with an alert
       Alert.alert("Alert", "Do you want to update without a title?", [
@@ -127,14 +137,14 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo, totalPoints, update
           text: "Yes",
           onPress: () => {
             // If the user chooses to proceed without a title, update the plan/task with an empty title and the provided task
-            updateTodo(id, "", modalTask, selectedDependency)
+            updateTodo(id, "", modalTask, selectedDependency);
             // Hide the update modal
-            setModalUpdateVisible(false)
+            setModalUpdateVisible(false);
           },
         },
-      ])
+      ]);
     }
-  }
+  };
 
   // Function to handle the deletion of a plan/task by its ID
   // Dispatch action to delete the plan/task with the given ID
@@ -154,20 +164,20 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo, totalPoints, update
           style: "destructive",
           onPress: () => {
             // If user confirms deletion, call deleteTodo function
-            deleteTodo(id)
-            console.log("Task deleted successfully")
+            deleteTodo(id);
+            console.log("Task deleted successfully");
           },
         },
       ]
-    )
-  }
+    );
+  };
 
   //get task list to the dropdown
   const generateDropdownData = (todoList) => {
     const dropdownData = todoList.map((todo) => ({
       label: todo.title || "[ No Title ]",
       value: todo.id,
-    }))
+    }));
 
     dropdownData.unshift({
       label: "No Dependency",
@@ -245,21 +255,20 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo, totalPoints, update
         console.error("Error loading status map from AsyncStorage:", error);
       }
     };
-  
+
     loadStatusMap();
   }, []);
-  
 
   const [statusMap, setStatusMap] = React.useState({});
 
   const taskStat = async (id, stat) => {
     try {
-      const currentTask = todo_list.find((task) => task.id === id)
-  
-      let updatedStatusMap
-  
+      const currentTask = todo_list.find((task) => task.id === id);
+
+      let updatedStatusMap;
+
       if (stat === "Done") {
-        const dependentTask = currentTask.dependentTaskId
+        const dependentTask = currentTask.dependentTaskId;
         if (dependentTask != null) {
           if (dependentTask.value != null) {
             if (statusMap.hasOwnProperty(dependentTask.value.toString())) {
@@ -267,77 +276,83 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo, totalPoints, update
               updatedStatusMap = {
                 ...statusMap,
                 [id]: stat,
-              }
+              };
               // Update the statusMap state
-              setStatusMap(updatedStatusMap)
+              setStatusMap(updatedStatusMap);
 
               const updatedPoints = totalPoints + 10;
               updateTotalPoints(updatedPoints);
 
-              setModalUpdateVisible(false)
+              setModalUpdateVisible(false);
             } else {
               //if there is a dependency and status != done
-              Alert.alert("Alert", "The primary task must be completed first.", [
-                {
-                  text: "OK",
-                },
-              ])
-              return // Exit early if dependency is not completed
+              Alert.alert(
+                "Alert",
+                "The primary task must be completed first.",
+                [
+                  {
+                    text: "OK",
+                  },
+                ]
+              );
+              return; // Exit early if dependency is not completed
             }
           }
         }
-  
+
         // If there is no dependency or dependency is completed
         updatedStatusMap = {
           ...statusMap,
           [id]: stat,
-        }
+        };
         const updatedPoints = totalPoints + 10;
         updateTotalPoints(updatedPoints);
-        setModalUpdateVisible(false)
+        setModalUpdateVisible(false);
       } else {
         // Create a new object reference with updated statusMap
         updatedStatusMap = {
           ...statusMap,
           [id]: "Due",
-        }
+        };
       }
-  
+
       const updatedPoints = totalPoints > 10 ? totalPoints - 10 : 0;
       updateTotalPoints(updatedPoints);
 
       // Update the statusMap state
-      setStatusMap(updatedStatusMap)
-  
-      // Save the updated statusMap to AsyncStorage
-      await AsyncStorage.setItem("statusMap", JSON.stringify(updatedStatusMap))
-    } catch (error) {
-      console.error("Error updating task status and saving to AsyncStorage:", error)
-    }
-  }
+      setStatusMap(updatedStatusMap);
 
+      // Save the updated statusMap to AsyncStorage
+      await AsyncStorage.setItem("statusMap", JSON.stringify(updatedStatusMap));
+    } catch (error) {
+      console.error(
+        "Error updating task status and saving to AsyncStorage:",
+        error
+      );
+    }
+  };
 
   // Function to open the modal for updating a selected plan/task
   const openModal = (item) => {
     // Set the selected item to the one passed as parameter
-    setSelectedItem(item)
+    setSelectedItem(item);
     // Set the modal task to the task of the selected item
-    setModalTask(item.task)
+    setModalTask(item.task);
     // Set the modal title to the title of the selected item
-    setModalTitle(item.title)
+    setModalTitle(item.title);
     // Set the modal dependency to the dependency ID of the selected item
-    setSelectedDependency(item.dependencyId)
+    setSelectedDependency(item.dependencyId);
     // Set the visibility of the update modal to true, thus opening the modal
-    setModalUpdateVisible(true)
+    setModalUpdateVisible(true);
     // Set the mode of the modal
-    setModalEditMode(true)
-  }
+    setModalEditMode(true);
+  };
 
   // Function for Selected Iterations
   const handlePress = (option) => {
-    setSelectedIteration(option)
-    console.log("User selected iteration : ", option)
-  }
+    setSelectedIteration(option);
+    console.log("User selected iteration : ", option);
+  };
 
   const filterClicked = () => {
     const filtered = todo_list.filter((task) => {
@@ -345,11 +360,11 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo, totalPoints, update
       return status === _.get(filterType, "value");
     });
     setFilteredTasks(filtered);
-  }
+  };
 
   const resetFilter = () => {
-    setFilteredTasks([])
-  }
+    setFilteredTasks([]);
+  };
 
   return (
     <View style={styles.container}>
@@ -360,7 +375,7 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo, totalPoints, update
             data={filteredTasks.length > 0 ? filteredTasks : todo_list}
             keyExtractor={(item) => item.id}
             renderItem={({ item, index }) => {
-              const status = statusMap[item.id] || "On going"
+              const status = statusMap[item.id] || "On going";
               const cardTitle = (
                 <Text
                   style={{ color: "black", fontWeight: "bold", fontSize: 20 }}
@@ -368,8 +383,8 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo, totalPoints, update
                   {" "}
                   {item.title || "[ No Title ]"}
                 </Text>
-              )
-              const cardSubTitleColor = status === "Done" ? "green" : "gray"
+              );
+              const cardSubTitleColor = status === "Done" ? "green" : "gray";
               const cardSubTitle = (
                 <Text style={{ color: cardSubTitleColor, fontSize: 15 }}>
                   Status : {status}{" "}
@@ -379,8 +394,8 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo, totalPoints, update
                     <Icon name="calendar-check-o" size={17} color={iconColor} />
                   )}
                 </Text>
-              )
-              const iconColor = status === "Done" ? "green" : "gray"
+              );
+              const iconColor = status === "Done" ? "green" : "gray";
               const dependentOn = (
                 <Paragraph
                   style={{ marginTop: 10, color: "tomato", fontSize: 12 }}
@@ -407,7 +422,7 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo, totalPoints, update
                     <Text style={styles.pointsText}>{item.points || 0}</Text>
                   </View>
                 </View>
-              )
+              );
 
               return (
                 <>
@@ -483,7 +498,7 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo, totalPoints, update
                     </Card>
                   </Pressable>
                 </>
-              )
+              );
             }}
           />
         </View>
@@ -493,11 +508,11 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo, totalPoints, update
           labelStyle={{ fontWeight: "bold", color: "white" }}
           style={{ backgroundColor: "tomato" }}
           onPress={() => {
-            setModalFormVisible(true)
-            setModalEditMode(false)
-            setTitle("")
-            setTask("")
-            setSelectedDependency(null)
+            setModalFormVisible(true);
+            setModalEditMode(false);
+            setTitle("");
+            setTask("");
+            setSelectedDependency(null);
           }}
         >
           Create a Task
@@ -554,13 +569,12 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo, totalPoints, update
               />
             </View>
             <View style={styles.filterButtonsContainer}>
-              <Button onPress={resetFilter}>
-                Reset Filter
-              </Button>
+              <Button onPress={resetFilter}>Reset Filter</Button>
               <Button
                 mode="contained"
                 style={{ marginLeft: 10 }}
                 onPress={filterClicked}
+                disabled={filterType == null}
               >
                 Filter
               </Button>
@@ -575,8 +589,8 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo, totalPoints, update
         transparent={true}
         visible={modalFormVisible || modalUpdateVisible}
         onRequestClose={() => {
-          setModalFormVisible(false)
-          setModalUpdateVisible(false)
+          setModalFormVisible(false);
+          setModalUpdateVisible(false);
         }}
       >
         <View style={styles.centeredView}>
@@ -597,7 +611,7 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo, totalPoints, update
               <View>
                 <Pressable
                   onPress={() => {
-                    setModalFormVisible(false), setModalUpdateVisible(false)
+                    setModalFormVisible(false), setModalUpdateVisible(false);
                   }}
                 >
                   <Icon name="close" size={24} color="red" />
@@ -770,8 +784,8 @@ const Tasks = ({ todo_list, addTodo, deleteTodo, updateTodo, totalPoints, update
         </View>
       </Modal>
     </View>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -874,7 +888,7 @@ const styles = StyleSheet.create({
   filterButtonsContainer: {
     flexDirection: "row",
     alignSelf: "center",
-    paddingTop: 20
+    paddingTop: 20,
   },
   pointsContainer: {
     flexDirection: "row",
@@ -901,15 +915,20 @@ const styles = StyleSheet.create({
     padding: 4,
     fontWeight: "bold",
   },
-})
+});
 
 const mapStateToProps = (state, ownProps) => {
   return {
     todo_list: state.todos.todo_list,
-    totalPoints: state.todos.totalPoints
-  }
-}
+    totalPoints: state.todos.totalPoints,
+  };
+};
 
-const mapDispatchToProps = { addTodo, deleteTodo, updateTodo, updateTotalPoints }
+const mapDispatchToProps = {
+  addTodo,
+  deleteTodo,
+  updateTodo,
+  updateTotalPoints,
+};
 
-export default connect(mapStateToProps, mapDispatchToProps)(Tasks)
+export default connect(mapStateToProps, mapDispatchToProps)(Tasks);
