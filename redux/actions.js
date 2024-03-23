@@ -3,14 +3,15 @@ import {
   DELETE_TODO,
   UPDATE_TODO,
   ADD_TO_ACTIVITY_LOG,
-  UPDATE_TOTAL_POINTS
+  UPDATE_TOTAL_POINTS,
+  UPDATE_STATUS_TODO,
 } from "./actionTypes";
 import uuid from "react-native-uuid";
 
-export const addTodo = (title, task, iteration, dependentTaskId, category) => {
+export const addTodo = (title, task, iteration, status, dependentTaskId, category) => {
   return {
     type: ADD_TODO,
-    payload: { id: uuid.v4(), title, task, iteration, dependentTaskId, category },
+    payload: { id: uuid.v4(), title, task, iteration, status, dependentTaskId, category },
   };
 };
 
@@ -33,3 +34,8 @@ export const updateTotalPoints = (points) => ({
   type: UPDATE_TOTAL_POINTS,
   payload: points,
 });
+
+export const updateStatusTodo = (id, status) => ({
+  type: UPDATE_STATUS_TODO,
+  payload: {id, status},
+})

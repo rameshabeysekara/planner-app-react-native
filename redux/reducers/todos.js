@@ -1,4 +1,4 @@
-import { ADD_TODO, DELETE_TODO, UPDATE_TODO, ADD_TO_ACTIVITY_LOG, UPDATE_TOTAL_POINTS } from "../actionTypes";
+import { ADD_TODO, DELETE_TODO, UPDATE_TODO, ADD_TO_ACTIVITY_LOG, UPDATE_TOTAL_POINTS, UPDATE_STATUS_TODO } from "../actionTypes";
 
 const initialState = {
   todo_list: [],
@@ -9,28 +9,29 @@ const initialState = {
 export default function (state = initialState, action) {
   switch (action.type) {
     case ADD_TODO: {
-  const { id, task, title, iteration, dependentTaskId, category } = action.payload;
-  const points = 10;
-  const log = {
-    type: "Added Task",
-    id,
-    title,
-    task,
-    iteration,
-    dependentTaskId,
-    category,
-    points
-  };
-
-  return {
-    ...state,
-    todo_list: [...state.todo_list, { id, task, title, iteration, dependentTaskId, category, points }],
-    activityLog: [log, ...(Array.isArray(state.activityLog) ? state.activityLog : [])]
-  };
-}
+      const { id, task, title, iteration, status, dependentTaskId, category } = action.payload;
+      const points = 10;
+      const log = {
+        type: "Added Task",
+        id,
+        title,
+        task,
+        iteration,
+        status,
+        dependentTaskId,
+        category,
+        points
+      };
+      console.log(" [ 25 ] todo.js | ADD_TODO : ", log);
+      return {
+        ...state,
+        todo_list: [...state.todo_list, { id, task, title, iteration, status, dependentTaskId, category, points }],
+        activityLog: [log, ...(Array.isArray(state.activityLog) ? state.activityLog : [])]
+      };
+    }
 
     case UPDATE_TODO: {
-      const { id, task, title, dependentTaskId} = action.payload;
+      const { id, task, title, dependentTaskId } = action.payload;
       const log = {
         type: "Updated Task",
         id,
@@ -77,6 +78,7 @@ export default function (state = initialState, action) {
             id: action.payload.id,
             title: action.payload.title,
             task: action.payload.task,
+            status: action.payload.status
           },
           ...state.activityLog,
         ],
@@ -90,7 +92,30 @@ export default function (state = initialState, action) {
       };
     }
 
+    case UPDATE_STATUS_TODO: {
+      const { id, status } = action.payload
+      const statusTodo = state.todo_list.find((todo) => todo.id === id);
+      const log = {
+        type: "Updated Status",
+        id,
+        title   : statusTodo.title,
+        task    : statusTodo.task,
+        status  : statusTodo.status,
+      }
+      return {
+        ...state,
+        todo_list: state.todo_list.map((todo) => {
+          if (todo.id === id) {
+            return { ...todo, status }
+          }
+          return todo
+        }),
+        activityLog: [log, ...(Array.isArray(state.activityLog) ? state.activityLog : [])]
+      }
+    }
+
     default:
       return state;
   }
 }
+
