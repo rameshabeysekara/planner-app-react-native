@@ -1,3 +1,6 @@
+
+export default store;
+
 import { configureStore } from "@reduxjs/toolkit";
 import {
   persistStore,
@@ -28,6 +31,7 @@ export const store = configureStore({
       serializableCheck: {
         ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
       },
+      immutableCheck: false, // Disable ImmutableStateInvariantMiddleware
     }),
 });
 
