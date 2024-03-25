@@ -18,7 +18,6 @@ import { Dropdown } from "react-native-element-dropdown";
 import { Button, TextInput, Card, Paragraph } from "react-native-paper";
 import { FontAwesome as Icon } from "@expo/vector-icons";
 import { Octicons } from "@expo/vector-icons";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { connect } from "react-redux";
 import {
   addTodo,
@@ -254,7 +253,7 @@ const Tasks = ({
   const generatePriorityLevels = () => {
     var priorityLevels = [ 0, 1, 2]
     const dropdownData = priorityLevels.map((level) => ({
-      label: level == 2 ? "high" : (level == 1 ? "Medium" : "Low"),
+      label: level == 2 ? "High" : (level == 1 ? "Medium" : "Low"),
       value: level,
     }));
 
@@ -480,7 +479,7 @@ const Tasks = ({
                     {" "}
                   </Text>
                   <View style={styles.priorityCard}>
-                    <Text style={styles.priorityText}>{item.priority == 2 ? "H" : (item.priority == 1 ? "M" : "L")}</Text>
+                    <Text style={styles.priorityText}>{item.priority == 2 ? "!!!" : (item.priority == 1 ? "!!" : "!")}</Text>
                   </View>
                 </>
               );
@@ -511,7 +510,7 @@ const Tasks = ({
                 <Paragraph
                   style={{ marginTop: 10, color: "tomato", fontSize: 12 }}
                 >
-                  <MaterialCommunityIcons name="axis-x-arrow-lock" size={15} color="grey" />{" "}
+                  <Octicons name="workflow" size={15} color="grey" />{" "}
                   {item.dependentTaskId != null
                     ? item.dependentTaskId.label
                     : "No Dependency"}
