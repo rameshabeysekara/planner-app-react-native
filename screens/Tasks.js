@@ -18,6 +18,7 @@ import { Dropdown } from "react-native-element-dropdown";
 import { Button, TextInput, Card, Paragraph } from "react-native-paper";
 import { FontAwesome as Icon } from "@expo/vector-icons";
 import { Octicons } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { connect } from "react-redux";
 import {
   addTodo,
@@ -479,7 +480,7 @@ const Tasks = ({
                     {" "}
                   </Text>
                   <View style={styles.priorityCard}>
-                    <Text style={styles.priorityText}>{item.priority == 2 ? "!!!" : (item.priority == 1 ? "!!" : "!")}</Text>
+                   {item.priority == 2 ? <MaterialCommunityIcons name="chevron-triple-up" size={15} color="white" /> : (item.priority == 1 ? <MaterialCommunityIcons name="chevron-double-up" size={15} color="white"/> : <MaterialCommunityIcons name="chevron-up" size={15} color="white"/>)}
                   </View>
                 </>
               );
@@ -1071,7 +1072,7 @@ const styles = StyleSheet.create({
   priorityCard: {
     backgroundColor: 'tomato',
     borderRadius: 10,
-    minWidth: 20,
+    minWidth: 10,
     height: 20,
     justifyContent: 'center',
     alignItems: 'center',
