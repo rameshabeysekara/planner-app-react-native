@@ -34,11 +34,13 @@ const Tasks = ({
   updateStatusTodo,
   totalPoints,
   updateTotalPoints,
+  priorityLevels
 }) => {
   const [modalFormVisible, setModalFormVisible] = React.useState(false);
   const [title, setTitle] = React.useState("");
   const [task, setTask] = React.useState("");
   const [selectedDependency, setSelectedDependency] = React.useState(null);
+  const [selectedPriority, setSelectedPriority] = React.useState(0);
   const [modalEditMode, setModalEditMode] = React.useState(false);
   const [selectedItem, setSelectedItem] = React.useState(null);
   const [modalTask, setModalTask] = React.useState("");
@@ -78,7 +80,8 @@ const Tasks = ({
           "On going", //STATUS DEFAULT VALUE
           selectedDependency,
           selectedCategory,
-          selectedColor
+          selectedColor,
+          selectedPriority.value
         );
 
         taskReminder(newTaskId);
@@ -86,6 +89,7 @@ const Tasks = ({
         setTitle("");
         setSelectedIteration(null);
         setSelectedDependency(null);
+        setSelectedPriority(0);
         setModalFormVisible(false);
         setSelectedCategory("");
         setSelectedColor(null);
@@ -105,13 +109,15 @@ const Tasks = ({
                 selectedIteration,
                 "On going", //STATUS DEFAULT VALUE
                 selectedDependency,
-                selectedCategory
+                selectedCategory,
+                selectedPriority.value
               );
               // taskReminder("")
               setTask("");
               setTitle("");
               setSelectedIteration(null);
               setSelectedDependency(null);
+              setSelectedPriority(0);
               setModalFormVisible(false);
             },
           },
@@ -178,7 +184,7 @@ const Tasks = ({
     // Check if the title is not empty
     if (modalTitle.trim() !== "") {
       // If title is not empty, update the plan/task with the provided ID, title, and task
-      updateTodo(id, modalTitle, modalTask, selectedDependency);
+      updateTodo(id, modalTitle, modalTask, selectedDependency, selectedPriority.value);
       // Hide the update modal
       setModalUpdateVisible(false);
     } else {
@@ -193,7 +199,7 @@ const Tasks = ({
           text: "Yes",
           onPress: () => {
             // If the user chooses to proceed without a title, update the plan/task with an empty title and the provided task
-            updateTodo(id, "", modalTask, selectedDependency);
+            updateTodo(id, "", modalTask, selectedDependency, selectedPriority.value);
             // Hide the update modal
             setModalUpdateVisible(false);
           },
@@ -239,6 +245,17 @@ const Tasks = ({
       label: "No Dependency",
       value: null,
     });
+    return dropdownData;
+  };
+
+  //get priority level types
+  const generatePriorityLevels = () => {
+    var priorityLevels = [ 0, 1, 2]
+    const dropdownData = priorityLevels.map((level) => ({
+      label: level == 2 ? "high" : (level == 1 ? "Medium" : "Low"),
+      value: level,
+    }));
+
     return dropdownData;
   };
 
@@ -414,6 +431,8 @@ const Tasks = ({
     setModalTitle(item.title);
     // Set the modal dependency to the dependency ID of the selected item
     setSelectedDependency(item.dependencyId);
+    // Set the priority level of the task
+    setSelectedPriority(item.priority)
     // Set the visibility of the update modal to true, thus opening the modal
     setModalUpdateVisible(true);
     // Set the mode of the modal
@@ -451,12 +470,16 @@ const Tasks = ({
             renderItem={({ item, index }) => {
               const status = statusMap[item.id] || "On going";
               const cardTitle = (
-                <Text
-                  style={{ color: "black", fontWeight: "bold", fontSize: 20 }}
-                >
-                  {" "}
-                  {item.title || "[ No Title ]"}
-                </Text>
+                <>
+                  <Text
+                    style={{ color: "black", fontWeight: "bold", fontSize: 20 }}
+                  >
+                    {" "}
+                    {item.title || "[ No Title ]"} 
+                    {" "}
+                    {item.priority == 2 ? "H" : (item.priority == 1 ? "M" : "L")}
+                  </Text>
+                </>
               );
               const statusColor =
                 status === "Done" ? "green" : status === "Due" ? "red" : "gray";
@@ -534,7 +557,7 @@ const Tasks = ({
                         right={(props) => (
                           <ButtonIcon
                             iconName="close"
-                            color="red"
+                            color="tomato"
                             onPress={() => handleDeleteTodo(item.id)}
                           />
                         )}
@@ -550,7 +573,6 @@ const Tasks = ({
                             gap: -5,
                           }}
                         >
-                          {/* {dependentOn} */}
                           <View>{dependentOn}</View>
                           <View>
                             <Text
@@ -606,6 +628,7 @@ const Tasks = ({
             setTitle("");
             setTask("");
             setSelectedDependency(null);
+            setSelectedPriority(0);
           }}
         >
           Create a Task
@@ -840,12 +863,29 @@ const Tasks = ({
                     search
                     labelField="label"
                     valueField="value"
-                    placeholder="No Dependency"
+                    placeholder="Select Dependency"
                     searchPlaceholder="Search..."
                     onChange={(value) => setSelectedDependency(value)}
                   />
-                  <View>
-                    <Text style={styles.label}>Select Color</Text>
+
+
+                  <View style={styles.separator}></View>
+                  <Text style={styles.label}>Select Priority Level</Text>
+                  <Dropdown
+                    style={styles.dropdown}
+                    label="Low"
+                    data={generatePriorityLevels()}
+                    value={selectedPriority}
+                    search
+                    labelField="label"
+                    valueField="value"
+                    placeholder="Select a Priority Level"
+                    searchPlaceholder="Search..."
+                    onChange={(value) => setSelectedPriority(value)}
+                  />
+
+                  <View style={styles.separator}></View>
+                  <Text style={styles.label}>Select Color</Text>
                     <Dropdown
                       style={styles.dropdown}
                       label="Select Color"
@@ -858,7 +898,6 @@ const Tasks = ({
                       searchPlaceholder="Search..."
                       onChange={(color) => handleColorSelection(color)}
                     />
-                  </View>
                 </View>
               )}
             </View>
@@ -1027,6 +1066,27 @@ const styles = StyleSheet.create({
     padding: 4,
     fontWeight: "bold",
   },
+
+  priorityCard: {
+    flexDirection: "row",
+    backgroundColor: "tomato",
+    borderRadius: 15,
+    padding: 4,
+    marginRight: 5,
+    shadowColor: "black",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  priorityText: {
+    color: "white",
+    padding: 4,
+    fontWeight: "bold",
+  }
 });
 
 const mapStateToProps = (state, ownProps) => {

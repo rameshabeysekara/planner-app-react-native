@@ -10,7 +10,7 @@ import {
 const initialState = {
   todo_list: [],
   activityLog: [],
-  totalPoints: 0,
+  totalPoints: 0
 };
 
 export default function (state = initialState, action) {
@@ -25,6 +25,7 @@ export default function (state = initialState, action) {
         dependentTaskId,
         category,
         color,
+        priority
       } = action.payload;
       const points = 10;
       const log = {
@@ -38,6 +39,7 @@ export default function (state = initialState, action) {
         category,
         color,
         points,
+        priority
       };
       return {
         ...state,
@@ -53,6 +55,7 @@ export default function (state = initialState, action) {
             category,
             color,
             points,
+            priority
           },
         ],
         activityLog: [
@@ -63,20 +66,21 @@ export default function (state = initialState, action) {
     }
 
     case UPDATE_TODO: {
-      const { id, task, title, dependentTaskId } = action.payload;
+      const { id, task, title, dependentTaskId, priority } = action.payload;
       const log = {
         type: "Updated Task",
         id,
         title,
         task,
         dependentTaskId,
+        priority
       };
 
       return {
         ...state,
         todo_list: state.todo_list.map((todo) => {
           if (todo.id === id) {
-            return { ...todo, task, title, dependentTaskId };
+            return { ...todo, task, title, dependentTaskId, priority };
           }
           return todo;
         }),

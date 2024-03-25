@@ -8,16 +8,16 @@ import {
 } from "./actionTypes";
 import uuid from "react-native-uuid";
 
-export const addTodo = (title, task, iteration, status, dependentTaskId, category, color) => {
+export const addTodo = (title, task, iteration, status, dependentTaskId, category, color, priority) => {
   return {
     type: ADD_TODO,
-    payload: { id: uuid.v4(), title, task, iteration, status, dependentTaskId, category, color },
+    payload: { id: uuid.v4(), title, task, iteration, status, dependentTaskId, category, color, priority },
   };
 };
 
-export const updateTodo = (id, title, task, dependentTaskId) => ({
+export const updateTodo = (id, title, task, dependentTaskId, priority) => ({
   type: UPDATE_TODO,
-  payload: { id, title, task, dependentTaskId },
+  payload: { id, title, task, dependentTaskId, priority },
 });
 
 export const deleteTodo = (id) => ({
