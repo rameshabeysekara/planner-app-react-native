@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     padding: 4,
     marginRight: 5,
-    shadowColor: '#000',
+    shadowColor: 'black',
     shadowOffset: {
       width: 0,
       height: 2,
@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
   },
   
   pointsText: {
-    color: 'black',
+    color: 'grey',
     padding: 4,
     fontWeight: 'bold',
   },

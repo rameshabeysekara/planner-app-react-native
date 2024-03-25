@@ -17,6 +17,8 @@ import {
 import { Dropdown } from "react-native-element-dropdown";
 import { Button, TextInput, Card, Paragraph } from "react-native-paper";
 import { FontAwesome as Icon } from "@expo/vector-icons";
+import { Octicons } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { connect } from "react-redux";
 import {
   addTodo,
@@ -474,18 +476,19 @@ const Tasks = ({
                   <Text
                     style={{ color: "black", fontWeight: "bold", fontSize: 20 }}
                   >
-                    {" "}
                     {item.title || "[ No Title ]"} 
                     {" "}
-                    {item.priority == 2 ? "H" : (item.priority == 1 ? "M" : "L")}
                   </Text>
+                  <View style={styles.priorityCard}>
+                    <Text style={styles.priorityText}>{item.priority == 2 ? "H" : (item.priority == 1 ? "M" : "L")}</Text>
+                  </View>
                 </>
               );
               const statusColor =
                 status === "Done" ? "green" : status === "Due" ? "red" : "gray";
               const cardSubTitle = (
                 <Text style={{ color: statusColor, fontSize: 15 }}>
-                  Status : {status}{" "}
+                  {status}{" "}
                   {status === "On going" ? (
                     <Icon name="hourglass-2" size={12} color={statusColor} />
                   ) : status === "Due" ? (
@@ -508,15 +511,14 @@ const Tasks = ({
                 <Paragraph
                   style={{ marginTop: 10, color: "tomato", fontSize: 12 }}
                 >
-                  {/* To Do = Imasha */}
-                  Dependent on :{" "}
+                  <MaterialCommunityIcons name="axis-x-arrow-lock" size={15} color="grey" />{" "}
                   {item.dependentTaskId != null
                     ? item.dependentTaskId.label
-                    : "None"}
+                    : "No Dependency"}
                 </Paragraph>
               );
 
-              const period = item.iteration || "No Iteration Selected";
+              const period = item.iteration || "No Iteration";
 
               const pointsLabel = (
                 <View style={styles.pointsContainer}>
@@ -582,7 +584,7 @@ const Tasks = ({
                                 fontSize: 12,
                               }}
                             >
-                              Iteration : {period}
+                              <Octicons name="iterations" size={15} color="grey" />{" "}{period}
                             </Text>
                           </View>
                         </View>
@@ -1052,27 +1054,6 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     padding: 4,
     marginRight: 5,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  pointsText: {
-    color: "black",
-    padding: 4,
-    fontWeight: "bold",
-  },
-
-  priorityCard: {
-    flexDirection: "row",
-    backgroundColor: "tomato",
-    borderRadius: 15,
-    padding: 4,
-    marginRight: 5,
     shadowColor: "black",
     shadowOffset: {
       width: 0,
@@ -1082,10 +1063,26 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
     elevation: 5,
   },
-  priorityText: {
-    color: "white",
+  pointsText: {
+    color: "grey",
     padding: 4,
     fontWeight: "bold",
+  },
+
+  priorityCard: {
+    backgroundColor: 'tomato',
+    borderRadius: 10,
+    minWidth: 20,
+    height: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 5,
+    paddingVertical: 2,
+  },
+  priorityText: {
+    color: 'white',
+    fontSize: 12,
+    fontWeight: 'bold',
   }
 });
 
