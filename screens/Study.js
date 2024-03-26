@@ -46,11 +46,15 @@ const Study = () => {
 
   const handleStart = () => {
     if (!name) {
-      Alert.alert("Oh Boy! 🥹 ", `It seems you need to add a name buddy`, [
-        {
-          text: "OK",
-        },
-      ]);
+      Alert.alert(
+        "Oh Boy! 🥹 ",
+        `Apparently, you need to enter the name of the session 🤔`,
+        [
+          {
+            text: "OK",
+          },
+        ]
+      );
     } else {
       setIsActive(true);
       setTimerStarted(true);
@@ -203,8 +207,6 @@ const styles = StyleSheet.create({
   },
   input: {
     width: "100%",
-    borderRadius: 5,
-    padding: 10,
     marginBottom: 10,
   },
   timeInput: {
