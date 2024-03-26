@@ -10,7 +10,7 @@ import {
 const initialState = {
   todo_list: [],
   activityLog: [],
-  totalPoints: 0
+  totalPoints: 0,
 };
 
 export default function (state = initialState, action) {
@@ -25,7 +25,7 @@ export default function (state = initialState, action) {
         dependentTaskId,
         category,
         color,
-        priority
+        priority,
       } = action.payload;
       const points = 10;
       const log = {
@@ -39,7 +39,7 @@ export default function (state = initialState, action) {
         category,
         color,
         points,
-        priority
+        priority,
       };
       return {
         ...state,
@@ -55,7 +55,7 @@ export default function (state = initialState, action) {
             category,
             color,
             points,
-            priority
+            priority,
           },
         ],
         activityLog: [
@@ -73,7 +73,7 @@ export default function (state = initialState, action) {
         title,
         task,
         dependentTaskId,
-        priority
+        priority,
       };
 
       return {

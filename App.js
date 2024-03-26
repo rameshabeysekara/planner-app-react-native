@@ -3,24 +3,19 @@ import { AppRegistry } from "react-native";
 import { name as appName } from "./app.json";
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View } from "react-native";
-import { createStackNavigator } from '@react-navigation/stack';
+import { createStackNavigator } from "@react-navigation/stack";
 import {
-  Button,
   MD3LightTheme as DefaultTheme,
   PaperProvider,
 } from "react-native-paper";
-import {
-  FontAwesome,
-  Feather,
-  AntDesign,
-  FontAwesome5,
-} from "@expo/vector-icons";
+import { FontAwesome, FontAwesome5 } from "@expo/vector-icons";
 import { NavigationContainer } from "@react-navigation/native";
 import { createMaterialBottomTabNavigator } from "react-native-paper/react-navigation";
 import Home from "./screens/Home";
 import Settings from "./screens/Settings";
 import ActivityLog from "./screens/ActivityLog";
 import Tasks from "./screens/Tasks";
+import Study from "./screens/Study";
 import Weather from "./screens/Weather";
 import { Provider } from "react-redux";
 import { store, persistor } from "./redux/store";
@@ -64,6 +59,16 @@ export default function App() {
               />
 
               <Tab.Screen
+                name="Study"
+                options={{
+                  tabBarIcon: () => (
+                    <FontAwesome5 name="book" size={24} color="black" />
+                  ),
+                }}
+                component={Study}
+              />
+
+              <Tab.Screen
                 name="Weather"
                 options={{
                   tabBarIcon: () => (
@@ -80,7 +85,7 @@ export default function App() {
                 name="Settings"
                 options={{
                   tabBarIcon: () => (
-                    <Feather name="settings" size={24} />
+                    <FontAwesome5 name="cog" size={24} color="black" />
                   ),
                 }}
               >
@@ -94,7 +99,7 @@ export default function App() {
                     <Stack.Screen
                       name="ActivityLog"
                       component={ActivityLog}
-                      options={{ title: 'Activity Log' }}
+                      options={{ title: "Activity Log" }}
                     />
                   </Stack.Navigator>
                 )}
@@ -106,7 +111,6 @@ export default function App() {
     </Provider>
   );
 }
-
 
 const styles = StyleSheet.create({
   container: {
