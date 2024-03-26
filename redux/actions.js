@@ -8,10 +8,29 @@ import {
 } from "./actionTypes";
 import uuid from "react-native-uuid";
 
-export const addTodo = (title, task, iteration, status, dependentTaskId, category, color, priority) => {
+export const addTodo = (
+  title,
+  task,
+  iteration,
+  status,
+  dependentTaskId,
+  category,
+  color,
+  priority
+) => {
   return {
     type: ADD_TODO,
-    payload: { id: uuid.v4(), title, task, iteration, status, dependentTaskId, category, color, priority },
+    payload: {
+      id: uuid.v4(),
+      title,
+      task,
+      iteration,
+      status,
+      dependentTaskId,
+      category,
+      color,
+      priority,
+    },
   };
 };
 
@@ -37,5 +56,5 @@ export const updateTotalPoints = (points) => ({
 
 export const updateStatusTodo = (id, status) => ({
   type: UPDATE_STATUS_TODO,
-  payload: {id, status},
-})
+  payload: { id, status },
+});
