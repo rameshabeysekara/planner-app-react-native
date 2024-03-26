@@ -44,6 +44,7 @@ const Study = () => {
     return () => clearInterval(interval);
   }, [isActive, isPaused, seconds, minutes, hours]);
 
+  // Start Timer
   const handleStart = () => {
     if (!name) {
       Alert.alert(
@@ -64,14 +65,17 @@ const Study = () => {
     }
   };
 
+  // Pause
   const handlePause = () => {
     setIsPaused(true);
   };
 
+  // Resume timer
   const handleResume = () => {
     setIsPaused(false);
   };
 
+  // Reset
   const handleReset = () => {
     setIsActive(false);
     setIsPaused(false);
@@ -80,6 +84,7 @@ const Study = () => {
     setSeconds(0);
   };
 
+  // Complete timer
   const handleCompleteTimer = () => {
     setTimeout(() => {
       Alert.alert("Whoops 🥳 ", `Study session "${name}" completed`, [
