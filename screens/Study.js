@@ -78,6 +78,8 @@ const Study = () => {
   // Reset
   const handleReset = () => {
     setIsActive(false);
+    setTimerStarted(false);
+    setName("");
     setIsPaused(false);
     setHours(0);
     setMinutes(0);
@@ -86,16 +88,28 @@ const Study = () => {
 
   // Complete timer
   const handleCompleteTimer = () => {
-    setTimeout(() => {
-      Alert.alert("Whoops 🥳 ", `Study session "${name}" completed`, [
-        {
-          text: "OK",
-        },
-      ]);
-      handleReset();
-      setName("");
-      setTimerStarted(false);
-    }, 100);
+    if (!isActive) {
+      Alert.alert(
+        "Oops! 🤔 ",
+        `Apparently, you need to start an activity to ends it `,
+        [
+          {
+            text: "OK",
+          },
+        ]
+      );
+    } else {
+      setTimeout(() => {
+        Alert.alert("Whoops 🥳 ", `Study session "${name}" completed`, [
+          {
+            text: "OK",
+          },
+        ]);
+        handleReset();
+        setName("");
+        setTimerStarted(false);
+      }, 100);
+    }
   };
 
   const formatTime = (time) => {
@@ -119,7 +133,7 @@ const Study = () => {
         />
       )}
 
-      {timerStarted && (
+      {isActive && timerStarted && (
         <Text style={styles.smalltitle}>Study Session: {name} ongoing...</Text>
       )}
 
@@ -175,12 +189,17 @@ const Study = () => {
               Resume
             </Button>
           )}
-        <Button mode="contained" onPress={handleReset}>
-          Reset
-        </Button>
-        <Button mode="contained" onPress={handleCompleteTimer}>
-          Done
-        </Button>
+
+        {isActive && (
+          <>
+            <Button mode="contained" onPress={handleReset}>
+              Reset
+            </Button>
+            <Button mode="contained" onPress={handleCompleteTimer}>
+              Complete
+            </Button>
+          </>
+        )}
       </View>
     </View>
   );
@@ -233,7 +252,11 @@ const styles = StyleSheet.create({
   },
   buttonsContainer: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    borderColor: "#ccc",
+    borderWidth: 2,
+    borderRadius: 50,
+    padding: 10,
+    justifyContent: "space-evenly",
     width: "100%",
     marginBottom: 20,
   },
