@@ -78,6 +78,8 @@ const Study = () => {
   // Reset
   const handleReset = () => {
     setIsActive(false);
+    setTimerStarted(false);
+    setName("");
     setIsPaused(false);
     setHours(0);
     setMinutes(0);
@@ -131,7 +133,7 @@ const Study = () => {
         />
       )}
 
-      {timerStarted && (
+      {isActive && timerStarted && (
         <Text style={styles.smalltitle}>Study Session: {name} ongoing...</Text>
       )}
 
