@@ -18,7 +18,7 @@ import { Dropdown } from "react-native-element-dropdown";
 import { Button, TextInput, Card, Paragraph } from "react-native-paper";
 import { FontAwesome as Icon } from "@expo/vector-icons";
 import { Octicons } from "@expo/vector-icons";
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { connect } from "react-redux";
 import {
   addTodo,
@@ -36,7 +36,7 @@ const Tasks = ({
   updateStatusTodo,
   totalPoints,
   updateTotalPoints,
-  priorityLevels
+  priorityLevels,
 }) => {
   const [modalFormVisible, setModalFormVisible] = React.useState(false);
   const [title, setTitle] = React.useState("");
@@ -186,7 +186,13 @@ const Tasks = ({
     // Check if the title is not empty
     if (modalTitle.trim() !== "") {
       // If title is not empty, update the plan/task with the provided ID, title, and task
-      updateTodo(id, modalTitle, modalTask, selectedDependency, selectedPriority.value);
+      updateTodo(
+        id,
+        modalTitle,
+        modalTask,
+        selectedDependency,
+        selectedPriority.value
+      );
       // Hide the update modal
       setModalUpdateVisible(false);
     } else {
@@ -201,7 +207,13 @@ const Tasks = ({
           text: "Yes",
           onPress: () => {
             // If the user chooses to proceed without a title, update the plan/task with an empty title and the provided task
-            updateTodo(id, "", modalTask, selectedDependency, selectedPriority.value);
+            updateTodo(
+              id,
+              "",
+              modalTask,
+              selectedDependency,
+              selectedPriority.value
+            );
             // Hide the update modal
             setModalUpdateVisible(false);
           },
@@ -252,9 +264,9 @@ const Tasks = ({
 
   //get priority level types
   const generatePriorityLevels = () => {
-    var priorityLevels = [ 0, 1, 2]
+    var priorityLevels = [0, 1, 2];
     const dropdownData = priorityLevels.map((level) => ({
-      label: level == 2 ? "High" : (level == 1 ? "Medium" : "Low"),
+      label: level == 2 ? "High" : level == 1 ? "Medium" : "Low",
       value: level,
     }));
 
@@ -434,7 +446,7 @@ const Tasks = ({
     // Set the modal dependency to the dependency ID of the selected item
     setSelectedDependency(item.dependencyId);
     // Set the priority level of the task
-    setSelectedPriority(item.priority)
+    setSelectedPriority(item.priority);
     // Set the visibility of the update modal to true, thus opening the modal
     setModalUpdateVisible(true);
     // Set the mode of the modal
@@ -476,11 +488,28 @@ const Tasks = ({
                   <Text
                     style={{ color: "black", fontWeight: "bold", fontSize: 20 }}
                   >
-                    {item.title || "[ No Title ]"} 
-                    {" "}
+                    {item.title || "[ No Title ]"}{" "}
                   </Text>
                   <View style={styles.priorityCard}>
-                   {item.priority == 2 ? <MaterialCommunityIcons name="chevron-triple-up" size={15} color="white" /> : (item.priority == 1 ? <MaterialCommunityIcons name="chevron-double-up" size={15} color="white"/> : <MaterialCommunityIcons name="chevron-up" size={15} color="white"/>)}
+                    {item.priority == 2 ? (
+                      <MaterialCommunityIcons
+                        name="chevron-triple-up"
+                        size={15}
+                        color="white"
+                      />
+                    ) : item.priority == 1 ? (
+                      <MaterialCommunityIcons
+                        name="chevron-double-up"
+                        size={15}
+                        color="white"
+                      />
+                    ) : (
+                      <MaterialCommunityIcons
+                        name="chevron-up"
+                        size={15}
+                        color="white"
+                      />
+                    )}
                   </View>
                 </>
               );
@@ -584,7 +613,12 @@ const Tasks = ({
                                 fontSize: 12,
                               }}
                             >
-                              <Octicons name="iterations" size={15} color="grey" />{" "}{period}
+                              <Octicons
+                                name="iterations"
+                                size={15}
+                                color="grey"
+                              />{" "}
+                              {period}
                             </Text>
                           </View>
                         </View>
@@ -758,7 +792,62 @@ const Tasks = ({
               </View>
               {!modalEditMode && (
                 <View>
-                  <View style={styles.separator}></View>
+                  <Text style={styles.label}>Select Category</Text>
+                  <Dropdown
+                    style={styles.dropdown}
+                    label="Task Category"
+                    data={generateCategoryDropdownData()}
+                    value={selectedCategory}
+                    search
+                    labelField="label"
+                    valueField="value"
+                    placeholder="Task Category"
+                    searchPlaceholder="Search..."
+                    onChange={(value) => setSelectedCategory(value)}
+                  />
+
+                  <Text style={styles.label}>Select Dependency</Text>
+                  <Dropdown
+                    style={styles.dropdown}
+                    label="No Dependency"
+                    data={generateDropdownData(todo_list ?? [])}
+                    value={selectedDependency}
+                    search
+                    labelField="label"
+                    valueField="value"
+                    placeholder="Select Dependency"
+                    searchPlaceholder="Search..."
+                    onChange={(value) => setSelectedDependency(value)}
+                  />
+
+                  <Text style={styles.label}>Select Priority Level</Text>
+                  <Dropdown
+                    style={styles.dropdown}
+                    label="Low"
+                    data={generatePriorityLevels()}
+                    value={selectedPriority}
+                    search
+                    labelField="label"
+                    valueField="value"
+                    placeholder="Select a Priority Level"
+                    searchPlaceholder="Search..."
+                    onChange={(value) => setSelectedPriority(value)}
+                  />
+
+                  <Text style={styles.label}>Select Color</Text>
+                  <Dropdown
+                    style={styles.dropdown}
+                    label="Select Color"
+                    data={availableColors}
+                    value={selectedColor}
+                    search
+                    labelField="label"
+                    valueField="value"
+                    placeholder="Select a Color"
+                    searchPlaceholder="Search..."
+                    onChange={(color) => handleColorSelection(color)}
+                    maxHeight={180}
+                  />
                   <Text style={styles.label}>Select Iteration</Text>
                   <View style={{ flexDirection: "row" }}>
                     {/* ONCE */}
@@ -840,66 +929,6 @@ const Tasks = ({
                       </Text>
                     </Pressable>
                   </View>
-                  <View style={styles.separator}></View>
-                  <Text style={styles.label}>Select Category</Text>
-                  <Dropdown
-                    style={styles.dropdown}
-                    label="Task Category"
-                    data={generateCategoryDropdownData()}
-                    value={selectedCategory}
-                    search
-                    labelField="label"
-                    valueField="value"
-                    placeholder="Task Category"
-                    searchPlaceholder="Search..."
-                    onChange={(value) => setSelectedCategory(value)}
-                  />
-
-                  <View style={styles.separator}></View>
-                  <Text style={styles.label}>Select Dependency</Text>
-                  <Dropdown
-                    style={styles.dropdown}
-                    label="No Dependency"
-                    data={generateDropdownData(todo_list ?? [])}
-                    value={selectedDependency}
-                    search
-                    labelField="label"
-                    valueField="value"
-                    placeholder="Select Dependency"
-                    searchPlaceholder="Search..."
-                    onChange={(value) => setSelectedDependency(value)}
-                  />
-
-
-                  <View style={styles.separator}></View>
-                  <Text style={styles.label}>Select Priority Level</Text>
-                  <Dropdown
-                    style={styles.dropdown}
-                    label="Low"
-                    data={generatePriorityLevels()}
-                    value={selectedPriority}
-                    search
-                    labelField="label"
-                    valueField="value"
-                    placeholder="Select a Priority Level"
-                    searchPlaceholder="Search..."
-                    onChange={(value) => setSelectedPriority(value)}
-                  />
-
-                  <View style={styles.separator}></View>
-                  <Text style={styles.label}>Select Color</Text>
-                    <Dropdown
-                      style={styles.dropdown}
-                      label="Select Color"
-                      data={availableColors}
-                      value={selectedColor}
-                      search
-                      labelField="label"
-                      valueField="value"
-                      placeholder="Select a Color"
-                      searchPlaceholder="Search..."
-                      onChange={(color) => handleColorSelection(color)}
-                    />
                 </View>
               )}
             </View>
@@ -962,6 +991,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginBottom: 5,
     color: "tomato",
+    marginTop: 10,
   },
   dropdown: {
     height: 50,
@@ -1070,20 +1100,20 @@ const styles = StyleSheet.create({
   },
 
   priorityCard: {
-    backgroundColor: 'tomato',
+    backgroundColor: "tomato",
     borderRadius: 10,
     minWidth: 10,
     height: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     paddingHorizontal: 5,
     paddingVertical: 2,
   },
   priorityText: {
-    color: 'white',
+    color: "white",
     fontSize: 12,
-    fontWeight: 'bold',
-  }
+    fontWeight: "bold",
+  },
 });
 
 const mapStateToProps = (state, ownProps) => {
