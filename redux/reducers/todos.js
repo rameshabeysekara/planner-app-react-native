@@ -5,6 +5,7 @@ import {
   ADD_TO_ACTIVITY_LOG,
   UPDATE_TOTAL_POINTS,
   UPDATE_STATUS_TODO,
+  RESET_TASKS_TODO, // SPRINT 04
 } from "../actionTypes";
 
 const initialState = {
@@ -26,6 +27,7 @@ export default function (state = initialState, action) {
         category,
         color,
         priority,
+        dateCreated,
       } = action.payload;
       const points = 10;
       const log = {
@@ -40,7 +42,9 @@ export default function (state = initialState, action) {
         color,
         points,
         priority,
+        dateCreated,
       };
+      console.log( "LOG : ", log )
       return {
         ...state,
         todo_list: [
@@ -56,6 +60,7 @@ export default function (state = initialState, action) {
             color,
             points,
             priority,
+            dateCreated,
           },
         ],
         activityLog: [
@@ -156,6 +161,15 @@ export default function (state = initialState, action) {
           log,
           ...(Array.isArray(state.activityLog) ? state.activityLog : []),
         ],
+      };
+    }
+
+    // SPRINT 04
+    case RESET_TASKS_TODO : {
+            
+      return {
+        ...state,
+        todo_list: [],
       };
     }
 
