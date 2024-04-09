@@ -13,16 +13,17 @@ const Home = ({ totalPoints, todo_list, activityLog }) => {
   const [points, setPoints] = useState(0); 
   const screenWidth = Dimensions.get("window").width;
 
+  console.log(activityLog);
   useEffect(() => {
     
     setPoints(totalPoints);
   }, [totalPoints]);
 
   const chartConfig = {
-    backgroundColor: "#e26a00",
-    backgroundGradientFrom: "#fb8c00",
-    backgroundGradientTo: "#ffa726",
-    decimalPlaces: 2, // optional, defaults to 2dp
+    backgroundColor: "#FF6347",
+    backgroundGradientFrom: "#7F7F7F",
+    backgroundGradientTo: "#FF6347",
+    decimalPlaces: 0,
     color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
     labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
     style: {
@@ -31,7 +32,7 @@ const Home = ({ totalPoints, todo_list, activityLog }) => {
     propsForDots: {
       r: "6",
       strokeWidth: "2",
-      stroke: "#ffa726"
+      stroke: "#FF6347"
     }
   }
   const countTasksByCategory = () => {
@@ -92,6 +93,40 @@ const Home = ({ totalPoints, todo_list, activityLog }) => {
       </View>
 
       <View style={styles.bottomContainer}>
+        <Text>Chart 1</Text>
+        <View  style={styles.chartContainer}>
+          <LineChart
+              data={{
+                labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Nov", "Dec"],
+                datasets: [
+                  {
+                    data: [
+                      Math.random() * 100,
+                      Math.random() * 100,
+                      Math.random() * 100,
+                      Math.random() * 100,
+                      Math.random() * 100,
+                      Math.random() * 100,
+                      Math.random() * 100,
+                      Math.random() * 100,
+                      Math.random() * 100,
+                      Math.random() * 100,
+                      Math.random() * 100
+                    ]
+                  }
+                ]
+              }}
+              width={screenWidth - 30} 
+              height={220}
+              yAxisInterval={1} 
+              chartConfig={chartConfig}
+              bezier
+              style={{
+                borderRadius: 16
+              }}
+           />
+        </View>
+        <Text>Chart 2</Text>
         <View  style={styles.chartContainer}>
           <PieChart
             data={countTasksByCategory()}
@@ -104,9 +139,6 @@ const Home = ({ totalPoints, todo_list, activityLog }) => {
             center={[5, 4]}
             absolute
           />
-        </View>
-        <View  style={styles.chartContainer}>
-        
         </View>
       </View>
     </SafeAreaView>

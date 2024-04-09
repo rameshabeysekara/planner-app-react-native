@@ -40,6 +40,7 @@ export default function (state = initialState, action) {
         color,
         points,
         priority,
+        timestamp: new Date().toISOString(), // Add timestamp
       };
       return {
         ...state,
@@ -74,6 +75,7 @@ export default function (state = initialState, action) {
         task,
         dependentTaskId,
         priority,
+        timestamp: new Date().toISOString(), // Add timestamp
       };
 
       return {
@@ -99,6 +101,7 @@ export default function (state = initialState, action) {
         id,
         title: deletedTodo.title,
         task: deletedTodo.task,
+        timestamp: new Date().toISOString(), // Add timestamp
       };
 
       return {
@@ -121,6 +124,7 @@ export default function (state = initialState, action) {
             title: action.payload.title,
             task: action.payload.task,
             status: action.payload.status,
+            timestamp: new Date().toISOString(), // Add timestamp
           },
           ...state.activityLog,
         ],
@@ -143,6 +147,7 @@ export default function (state = initialState, action) {
         title: statusTodo.title,
         task: statusTodo.task,
         status: statusTodo.status,
+        timestamp: new Date().toISOString(), // Add timestamp
       };
       return {
         ...state,
