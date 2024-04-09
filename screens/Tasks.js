@@ -1,4 +1,3 @@
-
 import React from "react";
 import ButtonIcon from "../components/ButtonIcon";
 import Spacer from "../components/Spacer";
@@ -28,9 +27,15 @@ import { FontAwesome as Icon } from "@expo/vector-icons";
 import { Octicons } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { connect, useDispatch } from "react-redux";
-import { addTodo, deleteTodo, updateTodo, updateTotalPoints, updateStatusTodo, resetAllTasks, } from "../redux/actions";
-
-
+import moment from "moment";
+import {
+  addTodo,
+  deleteTodo,
+  updateTodo,
+  updateTotalPoints,
+  updateStatusTodo,
+  resetAllTasks,
+} from "../redux/actions";
 
 const Tasks = ({
   todo_list,
@@ -58,60 +63,64 @@ const Tasks = ({
   const [filterType, setSelectedFilterType] = React.useState(null);
   const [filteredTasks, setFilteredTasks] = React.useState([]);
   const [selectedCategory, setSelectedCategory] = React.useState("");
-  const [notificationTriggered, setNotificationTriggered] = React.useState(false);
+  const [notificationTriggered, setNotificationTriggered] =
+    React.useState(false);
   const [statusMap, setStatusMap] = React.useState({});
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
-  const LL = moment().format('LL')
-  const ddd = moment().format('ddd');
-  const currentDate = `${LL} / ${ddd}` // Apr 9, 2024 / Tue
-  const stampDate = moment().format('lll')  // Apr 9, 2024 12:00 AM
+  const LL = moment().format("LL");
+  const ddd = moment().format("ddd");
+  const currentDate = `${LL} / ${ddd}`; // Apr 9, 2024 / Tue
+  const stampDate = moment().format("lll"); // Apr 9, 2024 12:00 AM
   // const dateOnce = moment().add(1, 'days').calendar()
 
-  const [countdown, setCountdown] = React.useState('');
+  const [countdown, setCountdown] = React.useState("");
   React.useEffect(() => {
     const interval = setInterval(() => {
-      const hoursUntilEndOfDay = moment().endOf('day').diff(moment(), 'hours');
-      const minutesUntilEndOfDay = moment().endOf('day').diff(moment(), 'minutes') % 60;
+      const hoursUntilEndOfDay = moment().endOf("day").diff(moment(), "hours");
+      const minutesUntilEndOfDay =
+        moment().endOf("day").diff(moment(), "minutes") % 60;
 
       if (hoursUntilEndOfDay < 0) {
-        setCountdown('Your task has passed.');
+        setCountdown("Your task has passed.");
       } else {
-        setCountdown(`${hoursUntilEndOfDay} hours and ${minutesUntilEndOfDay} minutes, until the end of this tasks.`);
-      }
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [])
-
-  const [ dailyCountdown, setDailyCountdown] = React.useState('')
-  React.useEffect(() => {
-    const interval = setInterval(() => {
-      const endOfNextDay = moment().add(1, 'days');
-      const diff = endOfNextDay.diff(moment());
-
-      if (diff < 0) {
-        setDailyCountdown('End of day has passed.');
-      } else {
-        setDailyCountdown(endOfNextDay.calendar());
-
+        setCountdown(
+          `${hoursUntilEndOfDay} hours and ${minutesUntilEndOfDay} minutes, until the end of this tasks.`
+        );
       }
     }, 1000);
 
     return () => clearInterval(interval);
   }, []);
 
-  const [ weeklyCountdown, setweeklyCountdown ] = React.useState('')
+  const [dailyCountdown, setDailyCountdown] = React.useState("");
   React.useEffect(() => {
-    
     const interval = setInterval(() => {
-      const endOfWeek = moment().add(1, 'week');
+      const endOfNextDay = moment().add(1, "days");
+      const diff = endOfNextDay.diff(moment());
+
+      if (diff < 0) {
+        setDailyCountdown("End of day has passed.");
+      } else {
+        setDailyCountdown(endOfNextDay.calendar());
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const [weeklyCountdown, setweeklyCountdown] = React.useState("");
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      const endOfWeek = moment().add(1, "week");
       const diff = endOfWeek.diff(moment());
 
       if (diff < 0) {
-        setweeklyCountdown('End of week has passed.');
+        setweeklyCountdown("End of week has passed.");
       } else {
-        const countdownDescription = moment().add(diff).format('MMMM D, YYYY / ddd');
+        const countdownDescription = moment()
+          .add(diff)
+          .format("MMMM D, YYYY / ddd");
         setweeklyCountdown(`${countdownDescription}`);
       }
     }, 1000);
@@ -119,10 +128,10 @@ const Tasks = ({
     return () => clearInterval(interval);
   }, []);
 
-  const [ monthlyCountdown, setMonthlyCountdown] = React.useState('')
+  const [monthlyCountdown, setMonthlyCountdown] = React.useState("");
   React.useEffect(() => {
     const interval = setInterval(() => {
-      const endOfMonth = moment().endOf('month').add(1, 'month');
+      const endOfMonth = moment().endOf("month").add(1, "month");
       const diff = endOfMonth.diff(moment());
 
       const duration = moment.duration(diff);
@@ -130,15 +139,16 @@ const Tasks = ({
       const hours = duration.hours();
 
       if (diff < 0) {
-        setMonthlyCountdown('End of month has passed.');
+        setMonthlyCountdown("End of month has passed.");
       } else {
-        setMonthlyCountdown(`${days} days and ${hours} hours, until the end of the month.`);
+        setMonthlyCountdown(
+          `${days} days and ${hours} hours, until the end of the month.`
+        );
       }
     }, 1000);
 
     return () => clearInterval(interval);
   }, []);
-
 
   const availableColors = [
     { label: "Tomato", value: "#FF6347" },
@@ -181,7 +191,7 @@ const Tasks = ({
   const handleAddTodo = async () => {
     if (task.trim() !== "") {
       if (title.trim() !== "") {
-        console.log(stampDate)
+        console.log(stampDate);
         // Call addTodo function and store the returned id
         const newTaskId = await addTodo(
           title,
@@ -268,7 +278,7 @@ const Tasks = ({
       if (countdown === 15 && !notificationTriggered) {
         // Trigger the notification
         Alert.alert("Reminder", `Your task "${title}" is about to Due.`, [
-          { text: "OK", onPress: () => { } },
+          { text: "OK", onPress: () => {} },
         ]);
 
         // Set notificationTriggered to true to prevent multiple notifications
@@ -381,7 +391,6 @@ const Tasks = ({
     }));
 
     return dropdownData;
-
   };
 
   const generateCategoryDropdownData = () => {
@@ -568,24 +577,24 @@ const Tasks = ({
   const handlePress = (option) => {
     // setSelectedIteration(option)
 
-    if ( option == "Once" ) {
-      console.log("Current Date : ", stampDate)
-      setSelectedIteration( countdown )
+    if (option == "Once") {
+      console.log("Current Date : ", stampDate);
+      setSelectedIteration(countdown);
     }
 
-    if ( option == "Daily" ) {
-      console.log("Current Date : ", stampDate)
-      setSelectedIteration( dailyCountdown )
+    if (option == "Daily") {
+      console.log("Current Date : ", stampDate);
+      setSelectedIteration(dailyCountdown);
     }
 
-    if ( option == "Weekly" ) {
-      console.log("Current Date : ", stampDate)
-      setSelectedIteration( weeklyCountdown )
+    if (option == "Weekly") {
+      console.log("Current Date : ", stampDate);
+      setSelectedIteration(weeklyCountdown);
     }
 
-    if ( option == "Monthly" ) {
-      console.log("Current Date : ", stampDate)
-      setSelectedIteration( monthlyCountdown )
+    if (option == "Monthly") {
+      console.log("Current Date : ", stampDate);
+      setSelectedIteration(monthlyCountdown);
     }
 
     Keyboard.dismiss();
@@ -608,29 +617,22 @@ const Tasks = ({
   // SPRINT 04 | Allow user delete all tasks - app reset (user data) #9
   // TO DO by RONALD
   const handleResetTasks = () => {
-
-    Alert.alert(
-      "Confirm Reset",
-      "This is to deleted all of your tasks.",
-      [
-        {
-          text: "Cancel",
-          style: "cancel",
-          onPress: () => console.log("Reset canceled"),
+    Alert.alert("Confirm Reset", "This is to deleted all of your tasks.", [
+      {
+        text: "Cancel",
+        style: "cancel",
+        onPress: () => console.log("Reset canceled"),
+      },
+      {
+        text: "Reset",
+        style: "destructive",
+        onPress: () => {
+          dispatch(resetAllTasks()); // Dispatch the resetAllTasks action
+          console.log("Reset Tasks Press : ", stampDate);
         },
-        {
-          text: "Reset",
-          style: "destructive",
-          onPress: () => {
-            dispatch(resetAllTasks()) // Dispatch the resetAllTasks action
-            console.log("Reset Tasks Press : ", stampDate)
-          },
-        },
-      ]
-    )
-
-  }
-
+      },
+    ]);
+  };
 
   return (
     <View style={styles.container}>
@@ -638,23 +640,29 @@ const Tasks = ({
         <Spacer />
         <View style={[styles.flatList]}>
           {/* SPRINT 04 */}
-          <View style={styles.resetTaskAlign} >
-            <View style={{ flexDirection: 'row', paddingLeft: 12 }}>
+          <View style={styles.resetTaskAlign}>
+            <View style={{ flexDirection: "row", paddingLeft: 12 }}>
               <Icon name="calendar" size={15} color="gray" />
               {/* <MaterialCommunityIcons name="stamper" size={15} color="gray" /> */}
-              <Text style={{ fontSize: 15, alignSelf: 'center', paddingLeft: 3, color: 'gray' }}>
+              <Text
+                style={{
+                  fontSize: 15,
+                  alignSelf: "center",
+                  paddingLeft: 3,
+                  color: "gray",
+                }}
+              >
                 {/* Display Month date year and day */}
                 {currentDate}
               </Text>
             </View>
-            <Pressable onPress={handleResetTasks} >
-              <Text style={styles.resetTasks}>
-                Reset Tasks
-              </Text>
+            <Pressable onPress={handleResetTasks}>
+              <Text style={styles.resetTasks}>Reset Tasks</Text>
             </Pressable>
           </View>
 
-          <FlatList data={filteredTasks.length > 0 ? filteredTasks : todo_list}
+          <FlatList
+            data={filteredTasks.length > 0 ? filteredTasks : todo_list}
             keyExtractor={(item) => item.id}
             renderItem={({ item, index }) => {
               const status = statusMap[item.id] || "On going";
@@ -690,7 +698,8 @@ const Tasks = ({
                 </>
               );
 
-              const statusColor = status === "Done" ? "green" : status === "Due" ? "red" : "gray";
+              const statusColor =
+                status === "Done" ? "green" : status === "Due" ? "red" : "gray";
 
               const cardSubTitle = (
                 <Text style={{ color: statusColor, fontSize: 15 }}>
@@ -714,10 +723,10 @@ const Tasks = ({
               );
 
               const dateCreated = (
-                <Text style={{ fontSize: 12, color: 'gray' }}>
+                <Text style={{ fontSize: 12, color: "gray" }}>
                   {item.dateCreated}
                 </Text>
-              )
+              );
 
               const dependentOn = (
                 <Paragraph
@@ -731,7 +740,7 @@ const Tasks = ({
               );
 
               const period = item.iteration || "No Iteration";
-              
+
               const pointsLabel = (
                 <View style={styles.pointsContainer}>
                   <View style={styles.pointsCard}>
@@ -841,8 +850,7 @@ const Tasks = ({
                   </Pressable>
                 </>
               );
-            }
-            }
+            }}
           />
         </View>
       </View>
@@ -985,7 +993,8 @@ const Tasks = ({
               {!modalEditMode && (
                 <View>
                   <Text style={styles.label}>Select Category</Text>
-                  <Dropdown style={styles.dropdown}
+                  <Dropdown
+                    style={styles.dropdown}
                     label="Task Category"
                     data={generateCategoryDropdownData()}
                     value={selectedCategory}
@@ -998,7 +1007,8 @@ const Tasks = ({
                   />
 
                   <Text style={styles.label}>Select Dependency</Text>
-                  <Dropdown style={styles.dropdown}
+                  <Dropdown
+                    style={styles.dropdown}
                     label="No Dependency"
                     data={generateDropdownData(todo_list ?? [])}
                     value={selectedDependency}
@@ -1011,7 +1021,8 @@ const Tasks = ({
                   />
 
                   <Text style={styles.label}>Select Priority Level</Text>
-                  <Dropdown style={styles.dropdown}
+                  <Dropdown
+                    style={styles.dropdown}
                     label="Low"
                     data={generatePriorityLevels()}
                     value={selectedPriority}
@@ -1024,7 +1035,8 @@ const Tasks = ({
                   />
 
                   <Text style={styles.label}>Select Color</Text>
-                  <Dropdown style={styles.dropdown}
+                  <Dropdown
+                    style={styles.dropdown}
                     label="Select Color"
                     data={availableColors}
                     value={selectedColor}
@@ -1042,7 +1054,9 @@ const Tasks = ({
                     <Pressable
                       style={({ pressed }) => [
                         styles.iterationPress,
-                        selectedIteration === countdown ? styles.selected : null,
+                        selectedIteration === countdown
+                          ? styles.selected
+                          : null,
                         {
                           backgroundColor: pressed
                             ? "lightcoral"
@@ -1061,7 +1075,9 @@ const Tasks = ({
                     <Pressable
                       style={({ pressed }) => [
                         styles.iterationPress,
-                        selectedIteration === dailyCountdown ? styles.selected : null,
+                        selectedIteration === dailyCountdown
+                          ? styles.selected
+                          : null,
                         {
                           backgroundColor: pressed
                             ? "lightcoral"
@@ -1080,7 +1096,9 @@ const Tasks = ({
                     <Pressable
                       style={({ pressed }) => [
                         styles.iterationPress,
-                        selectedIteration === weeklyCountdown ? styles.selected : null,
+                        selectedIteration === weeklyCountdown
+                          ? styles.selected
+                          : null,
                         {
                           backgroundColor: pressed
                             ? "lightcoral"
@@ -1099,7 +1117,9 @@ const Tasks = ({
                     <Pressable
                       style={({ pressed }) => [
                         styles.iterationPress,
-                        selectedIteration === monthlyCountdown ? styles.selected : null,
+                        selectedIteration === monthlyCountdown
+                          ? styles.selected
+                          : null,
                         {
                           backgroundColor: pressed
                             ? "lightcoral"
@@ -1303,12 +1323,12 @@ const styles = StyleSheet.create({
   resetTaskAlign: {
     width: 366,
     paddingRight: 15,
-    justifyContent: 'space-between',
-    flexDirection: 'row',
+    justifyContent: "space-between",
+    flexDirection: "row",
     // backgroundColor : 'gray',
   },
   resetTasks: {
-    alignSelf: 'flex-end',
+    alignSelf: "flex-end",
     color: "red",
     fontSize: 18,
   },
