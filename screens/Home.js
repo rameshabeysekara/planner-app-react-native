@@ -11,6 +11,7 @@ import {
 
 const Home = ({ totalPoints, todo_list, activityLog }) => {
   const [points, setPoints] = useState(0); 
+  const screenWidth = Dimensions.get("window").width;
 
   useEffect(() => {
     
@@ -79,7 +80,6 @@ const Home = ({ totalPoints, todo_list, activityLog }) => {
     return data;
   };
 
-
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.topContainer}>
@@ -91,8 +91,24 @@ const Home = ({ totalPoints, todo_list, activityLog }) => {
         </View>
       </View>
 
-      {/* <View style={styles.bottomContainer}>
-      </View> */}
+      <View style={styles.bottomContainer}>
+        <View  style={styles.chartContainer}>
+          <PieChart
+            data={countTasksByCategory()}
+            width={screenWidth - 30}
+            height={220}
+            chartConfig={chartConfig}
+            accessor={"population"}
+            backgroundColor={"transparent"}
+            paddingLeft={"15"}
+            center={[5, 4]}
+            absolute
+          />
+        </View>
+        <View  style={styles.chartContainer}>
+        
+        </View>
+      </View>
     </SafeAreaView>
   );
 };
@@ -141,6 +157,21 @@ const styles = StyleSheet.create({
     color: 'grey',
     padding: 4,
     fontWeight: 'bold',
+  },
+
+  chartContainer: {
+    width: '100%', 
+    borderRadius: 16, 
+    overflow: 'hidden', 
+    marginBottom: 40,
+    shadowColor: '#8B0000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5, 
   },
 });
 
