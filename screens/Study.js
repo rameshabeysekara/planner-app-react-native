@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { View, Text, StyleSheet, Alert } from "react-native";
 import { Button, TextInput } from "react-native-paper";
+import * as Notifications from "expo-notifications";
 
 const Study = () => {
   const [name, setName] = useState("");
@@ -10,6 +11,8 @@ const Study = () => {
   const [isActive, setIsActive] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [timerStarted, setTimerStarted] = useState(false);
+  const [reminder, setReminder] = useState(false);
+  const [schedule, setSchedule] = useState([]);
 
   useEffect(() => {
     let interval = null;
@@ -44,7 +47,7 @@ const Study = () => {
     return () => clearInterval(interval);
   }, [isActive, isPaused, seconds, minutes, hours]);
 
-  // Start Timer
+  // Start Timer button clicked
   const handleStart = () => {
     if (!name) {
       Alert.alert(
@@ -62,20 +65,26 @@ const Study = () => {
       hoursInputRef.current.blur();
       minutesInputRef.current.blur();
       secondsInputRef.current.blur();
+
+      //schedule reminder after timer has started
+      if (!reminder) {
+        startStudyReminder();
+        setReminder(true);
+      }
     }
   };
 
-  // Pause
+  // Pause button clicked
   const handlePause = () => {
     setIsPaused(true);
   };
 
-  // Resume timer
+  // Resume button clicked
   const handleResume = () => {
     setIsPaused(false);
   };
 
-  // Reset
+  // onclick of reset button
   const handleReset = () => {
     setIsActive(false);
     setTimerStarted(false);
@@ -84,6 +93,7 @@ const Study = () => {
     setHours(0);
     setMinutes(0);
     setSeconds(0);
+    setReminder(false);
   };
 
   // Complete timer
@@ -99,6 +109,7 @@ const Study = () => {
         ]
       );
     } else {
+      completeStudyReminder();
       setTimeout(() => {
         Alert.alert("Whoops 🥳 ", `Study session "${name}" completed`, [
           {
@@ -108,6 +119,7 @@ const Study = () => {
         handleReset();
         setName("");
         setTimerStarted(false);
+        setReminder(false);
       }, 100);
     }
   };
@@ -115,6 +127,76 @@ const Study = () => {
   const formatTime = (time) => {
     return time < 10 ? "0" + time : time;
   };
+
+  //Reminder once a user starts studying
+  async function startStudyReminder() {
+    try {
+      //Check for permission
+      const permissions = await Notifications.getPermissionsAsync();
+      if (!permissions.granted) {
+        const request = await Notifications.requestPermissionsAsync({
+          ios: {
+            allowAlert: true,
+            allowSound: true,
+            allowBadge: true,
+          },
+        });
+        console.log("Permission request:", request);
+
+        if (!request.granted) {
+          console.log("Permission not granted.");
+          return false;
+        } else if (request.granted) {
+          console.log("Permission granted.");
+        }
+      }
+
+      // Log the path to the image file
+      console.log("Image path:", require("../assets/book-solid.png"));
+
+      //schedule a notification
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: "Study Commenced",
+          body: `You're currently studying for "${name}" Duration: ${hours}hrs, ${minutes}mins, ${seconds}secs`,
+          sound: true,
+          icon: require("../assets/book-solid.png"),
+        },
+        trigger: {
+          seconds: 60,
+          repeats: false,
+        },
+      });
+
+      return true;
+    } catch {
+      console.error("Error scheduling reminder:", error);
+      return false;
+    }
+  }
+  //Reminder oncomplete of study (1min after study is complete)
+  async function completeStudyReminder() {
+    try {
+      //schedule a notification
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: "Study Complete!!!",
+          body: `You completed your study for "${name}" great job!`,
+          sound: true,
+          icon: require("../assets/book-solid.png"),
+        },
+        trigger: {
+          seconds: 60,
+          repeats: false,
+        },
+      });
+
+      return true;
+    } catch {
+      console.error("Error scheduling reminder:", error);
+      return false;
+    }
+  }
 
   // Refs for text inputs
   const hoursInputRef = useRef(null);

@@ -32,7 +32,8 @@
     "redux-persist": "^6.0.0",
     "redux-thunk": "^3.1.0",
     "expo-background-fetch": "~11.3.0",
-    "expo-task-manager": "~11.3.0"
+    "expo-task-manager": "~11.3.0",
+    "expo-notifications": "~0.20.1"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
