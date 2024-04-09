@@ -5,6 +5,7 @@ import {
   ADD_TO_ACTIVITY_LOG,
   UPDATE_TOTAL_POINTS,
   UPDATE_STATUS_TODO,
+  RESET_TASKS_TODO, // SPRINT 04
 } from "./actionTypes";
 import uuid from "react-native-uuid";
 
@@ -16,7 +17,8 @@ export const addTodo = (
   dependentTaskId,
   category,
   color,
-  priority
+  priority,
+  dateCreated
 ) => {
   return {
     type: ADD_TODO,
@@ -30,6 +32,7 @@ export const addTodo = (
       category,
       color,
       priority,
+      dateCreated
     },
   };
 };
@@ -58,3 +61,8 @@ export const updateStatusTodo = (id, status) => ({
   type: UPDATE_STATUS_TODO,
   payload: { id, status },
 });
+
+export const resetAllTasks = ( id ) => ({
+  type : RESET_TASKS_TODO,
+  payload : { id }
+})
