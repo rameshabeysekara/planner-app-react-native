@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import {
   LineChart,
   PieChart,
+  BarChart
 } from "react-native-chart-kit";
 
 const Home = ({ totalPoints, todo_list, activityLog }) => {
@@ -60,48 +61,147 @@ const Home = ({ totalPoints, todo_list, activityLog }) => {
     const countTasksByCategory = () => {
       let personalCount = 0;
       let workCount = 0;
+      let schoolCount = 0;
+      let fitnessCount = 0;
+      let healthCount = 0;
+      let familyCount = 0;
+      let financeCount = 0;
+      let homeCount = 0;
+      let hobbiesCount = 0;
+      let travelCount = 0;
+      let entertainmentCount = 0;
       let otherCount = 0;
-
+    
       todo_list.forEach(task => {
-          if (task.category && task.category.value === 'Personal') {
-              personalCount++;
-          } else if (task.category && task.category.value === 'Work') {
-              workCount++;
-          } else {
-              otherCount++;
+          switch(task.category && task.category.value) {
+              case 'Personal':
+                  personalCount++;
+                  break;
+              case 'Work':
+                  workCount++;
+                  break;
+              case 'School':
+                  schoolCount++;
+                  break;
+              case 'Fitness':
+                  fitnessCount++;
+                  break;
+              case 'Health':
+                  healthCount++;
+                  break;
+              case 'Family':
+                  familyCount++;
+                  break;
+              case 'Finance':
+                  financeCount++;
+                  break;
+              case 'Home':
+                  homeCount++;
+                  break;
+              case 'Hobbies':
+                  hobbiesCount++;
+                  break;
+              case 'Travel':
+                  travelCount++;
+                  break;
+              case 'Entertainment':
+                  entertainmentCount++;
+                  break;
+              default:
+                  otherCount++;
+                  break;
           }
       });
-
-      const generateColor = (opacity) => {
-          return `rgba(255, 99, 71, ${opacity})`;
-      };
-
+    
       const data = [
           {
               name: "Personal",
               population: personalCount,
-              color: generateColor(1), //  opacity: 0.6
+              color: "rgba(255, 87, 51, 0.8)",
               legendFontColor: "#7F7F7F",
-              legendFontSize: 15
+              legendFontSize: 10
           },
           {
               name: "Work",
               population: workCount,
-              color: generateColor(0.8), //  opacity: 0.8
+              color: "rgba(255, 195, 0, 0.8)",
               legendFontColor: "#7F7F7F",
-              legendFontSize: 15
+              legendFontSize: 10
+          },
+          {
+              name: "School",
+              population: schoolCount,
+              color: "rgba(54, 162, 235, 0.8)",
+              legendFontColor: "#7F7F7F",
+              legendFontSize: 10
+          },
+          {
+              name: "Fitness",
+              population: fitnessCount,
+              color: "rgba(76, 175, 80, 0.8)",
+              legendFontColor: "#7F7F7F",
+              legendFontSize: 10
+          },
+          {
+              name: "Health",
+              population: healthCount,
+              color: "rgba(156, 39, 176, 0.8)",
+              legendFontColor: "#7F7F7F",
+              legendFontSize: 10
+          },
+          {
+              name: "Family",
+              population: familyCount,
+              color: "rgba(255, 64, 129, 0.8)",
+              legendFontColor: "#7F7F7F",
+              legendFontSize: 10
+          },
+          {
+              name: "Finance",
+              population: financeCount,
+              color: "rgba(100, 169, 244, 0.8)",
+              legendFontColor: "#7F7F7F",
+              legendFontSize: 10
+          },
+          {
+              name: "Home",
+              population: homeCount,
+              color: "rgba(255, 87, 34, 0.8)",
+              legendFontColor: "#7F7F7F",
+              legendFontSize: 10
+          },
+          {
+              name: "Hobbies",
+              population: hobbiesCount,
+              color: "rgba(121, 85, 72, 0.8)",
+              legendFontColor: "#7F7F7F",
+              legendFontSize: 10
+          },
+          {
+              name: "Travel",
+              population: travelCount,
+              color: "rgba(0, 188, 102, 0.8)",
+              legendFontColor: "#7F7F7F",
+              legendFontSize: 10
+          },
+          {
+              name: "Entertainment",
+              population: entertainmentCount,
+              color: "rgba(1, 158, 18, 0.8)",
+              legendFontColor: "#7F7F7F",
+              legendFontSize: 10
           },
           {
               name: "Others",
               population: otherCount,
-              color: "#808080", 
+              color: "rgba(128, 128, 128, 0.8)",
               legendFontColor: "#7F7F7F",
-              legendFontSize: 15
+              legendFontSize: 10
           }
       ];
-
+    
       return data;
-    };
+    };    
 
 
   const handleScroll = (event) => {
@@ -143,6 +243,7 @@ const Home = ({ totalPoints, todo_list, activityLog }) => {
                 }}
              />
           </View>
+          <Text style={styles.chartTitle}>Task Categories</Text>
           <View style={styles.chartContainer}>
             <PieChart
               data={countTasksByCategory()}
@@ -203,7 +304,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   chartTitle: {
-    color: '#FF6347',
+    color: 'black',
     fontWeight: 'bold',
     fontSize: 12,
     marginBottom: 10,
