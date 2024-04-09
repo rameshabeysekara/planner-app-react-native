@@ -1,15 +1,84 @@
 import React, { useState, useEffect } from "react";
-import { Text, View, StyleSheet, SafeAreaView } from "react-native";
+import { Text, View, StyleSheet, SafeAreaView, Dimensions } from "react-native";
 import { FontAwesome as Icon } from '@expo/vector-icons';
 import { connect } from 'react-redux'; 
+import {
+  LineChart,
+  BarChart,
+  PieChart,
+  ProgressChart
+} from "react-native-chart-kit";
 
-const Home = ({ totalPoints }) => {
+const Home = ({ totalPoints, todo_list, activityLog }) => {
   const [points, setPoints] = useState(0); 
 
   useEffect(() => {
     
     setPoints(totalPoints);
   }, [totalPoints]);
+
+  const chartConfig = {
+    backgroundColor: "#e26a00",
+    backgroundGradientFrom: "#fb8c00",
+    backgroundGradientTo: "#ffa726",
+    decimalPlaces: 2, // optional, defaults to 2dp
+    color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+    labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+    style: {
+      borderRadius: 16
+    },
+    propsForDots: {
+      r: "6",
+      strokeWidth: "2",
+      stroke: "#ffa726"
+    }
+  }
+  const countTasksByCategory = () => {
+    let personalCount = 0;
+    let workCount = 0;
+    let otherCount = 0;
+
+    todo_list.forEach(task => {
+        if (task.category && task.category.value === 'Personal') {
+            personalCount++;
+        } else if (task.category && task.category.value === 'Work') {
+            workCount++;
+        } else {
+            otherCount++;
+        }
+    });
+
+    const generateColor = (opacity) => {
+        return `rgba(255, 99, 71, ${opacity})`;
+    };
+
+    const data = [
+        {
+            name: "Personal",
+            population: personalCount,
+            color: generateColor(1), //  opacity: 0.6
+            legendFontColor: "#7F7F7F",
+            legendFontSize: 15
+        },
+        {
+            name: "Work",
+            population: workCount,
+            color: generateColor(0.8), //  opacity: 0.8
+            legendFontColor: "#7F7F7F",
+            legendFontSize: 15
+        },
+        {
+            name: "Others",
+            population: otherCount,
+            color: "#808080", 
+            legendFontColor: "#7F7F7F",
+            legendFontSize: 15
+        }
+    ];
+
+    return data;
+  };
+
 
   return (
     <SafeAreaView style={styles.container}>
@@ -22,9 +91,8 @@ const Home = ({ totalPoints }) => {
         </View>
       </View>
 
-      <View style={styles.bottomContainer}>
-        <Text>Dashboards here</Text>
-      </View>
+      {/* <View style={styles.bottomContainer}>
+      </View> */}
     </SafeAreaView>
   );
 };
@@ -79,6 +147,8 @@ const styles = StyleSheet.create({
 const mapStateToProps = (state) => {
   return {
     totalPoints: state.todos.totalPoints,
+    todo_list: state.todos.todo_list,
+    activityLog: state.todos.activityLog
   };
 };
 
