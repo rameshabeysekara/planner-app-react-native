@@ -151,16 +151,13 @@ const Study = () => {
         }
       }
 
-      // Log the path to the image file
-      console.log("Image path:", require("../assets/book-solid.png"));
-
       //schedule a notification
       await Notifications.scheduleNotificationAsync({
         content: {
           title: "Study Commenced",
           body: `You're currently studying for "${name}" Duration: ${hours}hrs, ${minutes}mins, ${seconds}secs`,
           sound: true,
-          icon: require("../assets/book-solid.png"),
+          icon: "../assets/book-solid.png",
         },
         trigger: {
           seconds: 60,
@@ -183,7 +180,7 @@ const Study = () => {
           title: "Study Complete!!!",
           body: `You completed your study for "${name}" great job!`,
           sound: true,
-          icon: require("../assets/book-solid.png"),
+          icon: "../assets/book-solid.png",
         },
         trigger: {
           seconds: 60,
