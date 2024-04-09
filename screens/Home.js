@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Text, View, StyleSheet, SafeAreaView, Dimensions, ScrollView } from "react-native";
+import { Text, View, StyleSheet, SafeAreaView, Dimensions, ScrollView, Animated } from "react-native";
 import { FontAwesome as Icon } from '@expo/vector-icons';
 import { connect } from 'react-redux'; 
 import {
@@ -11,11 +11,56 @@ import {
 const Home = ({ totalPoints, todo_list, activityLog }) => {
   const [points, setPoints] = useState(0); 
   const [scrollPosition, setScrollPosition] = useState(0);
+  const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
   const screenWidth = Dimensions.get("window").width;
+  const [fadeAnim] = useState(new Animated.Value(1));
+
+
+  const motivationalMessages = [
+    "Ready to conquer your day? Let's conquer those tasks and make waves of accomplishment!",
+    "Every task completed is a step closer to your dreams. Let's make today count!",
+    "Embrace the power of progress. One task at a time, you're unstoppable!",
+    "Unlock your potential and achieve greatness. Your to-do list is your roadmap to success!",
+    "Today is full of possibilities. Let's tackle those tasks and make magic happen!",
+    "You've got this! With determination and focus, your to-dos are mere stepping stones to victory!",
+    "Seize the day and make it yours! Your to-do list is your ally on the journey to excellence!",
+    "Rise and shine, it's time to thrive! Let's conquer those tasks and make waves of accomplishment!",
+    "Small steps lead to big victories. Keep pushing forward and watch your dreams unfold!",
+    "Embrace the challenge and celebrate the progress. You're one step closer to greatness!"
+  ];
 
   useEffect(() => {
     setPoints(totalPoints);
   }, [totalPoints]);
+
+  useEffect(() => {
+    // Start the animation loop
+    const interval = setInterval(() => {
+      animateOut(() => {
+        setCurrentMessageIndex((prevIndex) => (prevIndex + 1) % motivationalMessages.length);
+        animateIn();
+      });
+    }, 5000); // Change message every 5 seconds
+
+    // Clear the interval when the component is unmounted
+    return () => clearInterval(interval);
+  }, []);
+
+  const animateIn = () => {
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 500,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const animateOut = (callback) => {
+    Animated.timing(fadeAnim, {
+      toValue: 0,
+      duration: 500,
+      useNativeDriver: true,
+    }).start(callback);
+  };
 
   const chartConfig = {
     backgroundColor: "#FF6347",
@@ -211,12 +256,18 @@ const Home = ({ totalPoints, todo_list, activityLog }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-        <View style={styles.topContainer}>
+        <View style={styles.topContainer}> 
+          <Text style={styles.greeting}>Hello!</Text>
           <View style={styles.pointsContainer}>
-            <View style={styles.pointsCard}>
-              <Icon name="trophy" size={20} color="tomato" style={{ padding: 3 }} />
-              <Text style={styles.pointsText}>{ points || 0}</Text>
-            </View>
+              <View style={styles.pointsCard}>
+                <Icon name="trophy" size={20} color="tomato" style={{ padding: 3 }} />
+                <Text style={styles.pointsText}>{ points || 0}</Text>
+              </View>
+          </View>
+          <View style={styles.header}>
+            <Animated.View style={[styles.messageContainer, { opacity: fadeAnim }]}>
+              <Text style={styles.messageText}>{motivationalMessages[currentMessageIndex]}</Text>
+            </Animated.View>
           </View>
         </View>
 
@@ -268,9 +319,26 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   topContainer: {
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: "flex-start", 
+    alignItems: "flex-start", 
     padding: 16,
+    flexDirection: "row",
+    flexWrap: "wrap",
+  },
+  header: {
+    alignItems: "flex-start",
+    alignSelf: 'flex-start', 
+  },
+  greeting: {
+    fontWeight: "bold",
+    fontSize: 40,
+    marginBottom: 8,
+    textAlign: 'left', 
+    color: "#FF6347"
+  },
+  motivationalMessage: {
+    fontSize: 16,
+    color: "#555",
   },
   bottomContainer: {
     flex: 1,
@@ -280,15 +348,17 @@ const styles = StyleSheet.create({
   },
   pointsContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start', 
     paddingBottom: 5,
+    justifyContent: 'flex-end', 
+    flex: 1, 
   },
   pointsCard: {
     flexDirection: 'row',
     backgroundColor: 'white',
     borderRadius: 15,
     padding: 4,
-    marginRight: 5,
+    marginLeft: 'auto', 
     shadowColor: 'black',
     shadowOffset: {
       width: 0,
@@ -324,6 +394,8 @@ const styles = StyleSheet.create({
     elevation: 5, 
   },
 });
+
+
 
 const mapStateToProps = (state) => {
   return {
