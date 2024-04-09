@@ -13,19 +13,28 @@ import {
   Pressable,
   Alert,
   Keyboard,
+  Share,
 } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
-import { Button, TextInput, Card, Paragraph } from "react-native-paper";
+import {
+  Button,
+  TextInput,
+  Card,
+  Paragraph,
+  IconButton,
+} from "react-native-paper";
 import { FontAwesome as Icon } from "@expo/vector-icons";
 import { Octicons } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { connect } from "react-redux";
+import { connect, useDispatch } from "react-redux";
+import moment from "moment";
 import {
   addTodo,
   deleteTodo,
   updateTodo,
   updateTotalPoints,
   updateStatusTodo,
+  resetAllTasks,
 } from "../redux/actions";
 
 const Tasks = ({
@@ -37,6 +46,7 @@ const Tasks = ({
   totalPoints,
   updateTotalPoints,
   priorityLevels,
+  resetAllTasks,
 }) => {
   const [modalFormVisible, setModalFormVisible] = React.useState(false);
   const [title, setTitle] = React.useState("");
@@ -56,6 +66,89 @@ const Tasks = ({
   const [notificationTriggered, setNotificationTriggered] =
     React.useState(false);
   const [statusMap, setStatusMap] = React.useState({});
+  const dispatch = useDispatch();
+
+  const LL = moment().format("LL");
+  const ddd = moment().format("ddd");
+  const currentDate = `${LL} / ${ddd}`; // Apr 9, 2024 / Tue
+  const stampDate = moment().format("lll"); // Apr 9, 2024 12:00 AM
+  // const dateOnce = moment().add(1, 'days').calendar()
+
+  const [countdown, setCountdown] = React.useState("");
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      const hoursUntilEndOfDay = moment().endOf("day").diff(moment(), "hours");
+      const minutesUntilEndOfDay =
+        moment().endOf("day").diff(moment(), "minutes") % 60;
+
+      if (hoursUntilEndOfDay < 0) {
+        setCountdown("Your task has passed.");
+      } else {
+        setCountdown(
+          `${hoursUntilEndOfDay} hours and ${minutesUntilEndOfDay} minutes, until the end of this tasks.`
+        );
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const [dailyCountdown, setDailyCountdown] = React.useState("");
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      const endOfNextDay = moment().add(1, "days");
+      const diff = endOfNextDay.diff(moment());
+
+      if (diff < 0) {
+        setDailyCountdown("End of day has passed.");
+      } else {
+        setDailyCountdown(endOfNextDay.calendar());
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const [weeklyCountdown, setweeklyCountdown] = React.useState("");
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      const endOfWeek = moment().add(1, "week");
+      const diff = endOfWeek.diff(moment());
+
+      if (diff < 0) {
+        setweeklyCountdown("End of week has passed.");
+      } else {
+        const countdownDescription = moment()
+          .add(diff)
+          .format("MMMM D, YYYY / ddd");
+        setweeklyCountdown(`${countdownDescription}`);
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const [monthlyCountdown, setMonthlyCountdown] = React.useState("");
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      const endOfMonth = moment().endOf("month").add(1, "month");
+      const diff = endOfMonth.diff(moment());
+
+      const duration = moment.duration(diff);
+      const days = duration.days();
+      const hours = duration.hours();
+
+      if (diff < 0) {
+        setMonthlyCountdown("End of month has passed.");
+      } else {
+        setMonthlyCountdown(
+          `${days} days and ${hours} hours, until the end of the month.`
+        );
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   const availableColors = [
     { label: "Tomato", value: "#FF6347" },
@@ -71,9 +164,34 @@ const Tasks = ({
     setSelectedColor(color);
   };
 
+  const onShare = async (item) => {
+    try {
+      const shareOptions = {
+        message: item.task,
+        subject: "Task from my planner app",
+      };
+
+      const result = await Share.share(shareOptions);
+
+      if (result.action === Share.sharedAction) {
+        if (result.activityType) {
+          console.log(`Shared via ${result.activityType}`);
+        } else {
+          console.log("Content shared successfully!");
+        }
+      } else if (result.action === Share.dismissedAction) {
+        console.log("Share action dismissed");
+      }
+    } catch (error) {
+      console.error("Error sharing content:", error.message);
+      alert("Oops! Something went wrong while sharing.");
+    }
+  };
+
   const handleAddTodo = async () => {
     if (task.trim() !== "") {
       if (title.trim() !== "") {
+        console.log(stampDate);
         // Call addTodo function and store the returned id
         const newTaskId = await addTodo(
           title,
@@ -83,10 +201,11 @@ const Tasks = ({
           selectedDependency,
           selectedCategory,
           selectedColor,
-          selectedPriority.value
+          selectedPriority.value,
+          stampDate
         );
 
-        taskReminder(newTaskId);
+        // taskReminder(newTaskId);
         setTask("");
         setTitle("");
         setSelectedIteration(null);
@@ -95,6 +214,7 @@ const Tasks = ({
         setModalFormVisible(false);
         setSelectedCategory("");
         setSelectedColor(null);
+        // setCurrentDates('')
       } else {
         // If the title is empty, prompt the user
         Alert.alert("Alert", "Do you want to add the task without a title?", [
@@ -455,7 +575,28 @@ const Tasks = ({
 
   // Function for Selected Iterations
   const handlePress = (option) => {
-    setSelectedIteration(option);
+    // setSelectedIteration(option)
+
+    if (option == "Once") {
+      console.log("Current Date : ", stampDate);
+      setSelectedIteration(countdown);
+    }
+
+    if (option == "Daily") {
+      console.log("Current Date : ", stampDate);
+      setSelectedIteration(dailyCountdown);
+    }
+
+    if (option == "Weekly") {
+      console.log("Current Date : ", stampDate);
+      setSelectedIteration(weeklyCountdown);
+    }
+
+    if (option == "Monthly") {
+      console.log("Current Date : ", stampDate);
+      setSelectedIteration(monthlyCountdown);
+    }
+
     Keyboard.dismiss();
   };
 
@@ -473,16 +614,59 @@ const Tasks = ({
     setFilterModalVisible(false);
   };
 
+  // SPRINT 04 | Allow user delete all tasks - app reset (user data) #9
+  // TO DO by RONALD
+  const handleResetTasks = () => {
+    Alert.alert("Confirm Reset", "This is to deleted all of your tasks.", [
+      {
+        text: "Cancel",
+        style: "cancel",
+        onPress: () => console.log("Reset canceled"),
+      },
+      {
+        text: "Reset",
+        style: "destructive",
+        onPress: () => {
+          dispatch(resetAllTasks()); // Dispatch the resetAllTasks action
+          console.log("Reset Tasks Press : ", stampDate);
+        },
+      },
+    ]);
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.content}>
         <Spacer />
         <View style={[styles.flatList]}>
+          {/* SPRINT 04 */}
+          <View style={styles.resetTaskAlign}>
+            <View style={{ flexDirection: "row", paddingLeft: 12 }}>
+              <Icon name="calendar" size={15} color="gray" />
+              {/* <MaterialCommunityIcons name="stamper" size={15} color="gray" /> */}
+              <Text
+                style={{
+                  fontSize: 15,
+                  alignSelf: "center",
+                  paddingLeft: 3,
+                  color: "gray",
+                }}
+              >
+                {/* Display Month date year and day */}
+                {currentDate}
+              </Text>
+            </View>
+            <Pressable onPress={handleResetTasks}>
+              <Text style={styles.resetTasks}>Reset Tasks</Text>
+            </Pressable>
+          </View>
+
           <FlatList
             data={filteredTasks.length > 0 ? filteredTasks : todo_list}
             keyExtractor={(item) => item.id}
             renderItem={({ item, index }) => {
               const status = statusMap[item.id] || "On going";
+
               const cardTitle = (
                 <>
                   <Text
@@ -513,8 +697,10 @@ const Tasks = ({
                   </View>
                 </>
               );
+
               const statusColor =
                 status === "Done" ? "green" : status === "Due" ? "red" : "gray";
+
               const cardSubTitle = (
                 <Text style={{ color: statusColor, fontSize: 15 }}>
                   {status}{" "}
@@ -533,6 +719,12 @@ const Tasks = ({
                       color={statusColor}
                     />
                   )}
+                </Text>
+              );
+
+              const dateCreated = (
+                <Text style={{ fontSize: 12, color: "gray" }}>
+                  {item.dateCreated}
                 </Text>
               );
 
@@ -569,15 +761,15 @@ const Tasks = ({
                     <Card
                       style={{
                         width: 365,
-                        marginTop: 12,
-                        margin: 6,
+                        marginTop: 6,
                         borderColor: item.color?.value,
                         borderWidth: 2,
                       }}
                     >
                       <Card.Title
                         title={<>{cardTitle}</>}
-                        subtitle={<>{cardSubTitle}</>}
+                        // subtitle={<>{cardSubTitle}</>}
+                        subtitle={dateCreated}
                         left={(props) => (
                           <CustomIcon
                             category={item.category}
@@ -586,13 +778,21 @@ const Tasks = ({
                           />
                         )}
                         right={(props) => (
-                          <ButtonIcon
-                            iconName="close"
-                            color="tomato"
-                            onPress={() => handleDeleteTodo(item.id)}
-                          />
+                          <View style={{ flexDirection: "row" }}>
+                            <IconButton
+                              icon="share"
+                              onPress={() => onShare(item)}
+                            />
+
+                            <ButtonIcon
+                              iconName="close"
+                              color="tomato"
+                              onPress={() => handleDeleteTodo(item.id)}
+                            />
+                          </View>
                         )}
                       />
+
                       <Card.Content>
                         <Paragraph style={{ paddingTop: 5, paddingBottom: 5 }}>
                           {item.task}
@@ -854,11 +1054,13 @@ const Tasks = ({
                     <Pressable
                       style={({ pressed }) => [
                         styles.iterationPress,
-                        selectedIteration === "Once" ? styles.selected : null,
+                        selectedIteration === countdown
+                          ? styles.selected
+                          : null,
                         {
                           backgroundColor: pressed
                             ? "lightcoral"
-                            : selectedIteration === "Once"
+                            : selectedIteration === countdown
                               ? "tomato"
                               : "lightgray",
                         },
@@ -873,11 +1075,13 @@ const Tasks = ({
                     <Pressable
                       style={({ pressed }) => [
                         styles.iterationPress,
-                        selectedIteration === "Daily" ? styles.selected : null,
+                        selectedIteration === dailyCountdown
+                          ? styles.selected
+                          : null,
                         {
                           backgroundColor: pressed
                             ? "lightcoral"
-                            : selectedIteration === "Daily"
+                            : selectedIteration === dailyCountdown
                               ? "tomato"
                               : "lightgray",
                         },
@@ -892,11 +1096,13 @@ const Tasks = ({
                     <Pressable
                       style={({ pressed }) => [
                         styles.iterationPress,
-                        selectedIteration === "Weekly" ? styles.selected : null,
+                        selectedIteration === weeklyCountdown
+                          ? styles.selected
+                          : null,
                         {
                           backgroundColor: pressed
                             ? "lightcoral"
-                            : selectedIteration === "Weekly"
+                            : selectedIteration === weeklyCountdown
                               ? "tomato"
                               : "lightgray",
                         },
@@ -911,13 +1117,13 @@ const Tasks = ({
                     <Pressable
                       style={({ pressed }) => [
                         styles.iterationPress,
-                        selectedIteration === "Monthly"
+                        selectedIteration === monthlyCountdown
                           ? styles.selected
                           : null,
                         {
                           backgroundColor: pressed
                             ? "lightcoral"
-                            : selectedIteration === "Monthly"
+                            : selectedIteration === monthlyCountdown
                               ? "tomato"
                               : "lightgray",
                         },
@@ -976,7 +1182,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   flatList: {
-    // paddingTop: Constants.statusBarHeight,
     marginTop: Constants.statusBarHeight,
     flexGrow: 1,
     paddingBottom: Constants.statusBarHeight,
@@ -1114,6 +1319,19 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: "bold",
   },
+  // SPRINT 04
+  resetTaskAlign: {
+    width: 366,
+    paddingRight: 15,
+    justifyContent: "space-between",
+    flexDirection: "row",
+    // backgroundColor : 'gray',
+  },
+  resetTasks: {
+    alignSelf: "flex-end",
+    color: "red",
+    fontSize: 18,
+  },
 });
 
 const mapStateToProps = (state, ownProps) => {
@@ -1129,6 +1347,7 @@ const mapDispatchToProps = {
   updateTodo,
   updateStatusTodo,
   updateTotalPoints,
+  resetAllTasks,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Tasks);
