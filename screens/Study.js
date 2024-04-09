@@ -141,8 +141,6 @@ const Study = () => {
             allowBadge: true,
           },
         });
-        console.log("Permission request:", request);
-
         if (!request.granted) {
           console.log("Permission not granted.");
           return false;
@@ -157,7 +155,6 @@ const Study = () => {
           title: "Study Commenced",
           body: `You're currently studying for "${name}" Duration: ${hours}hrs, ${minutes}mins, ${seconds}secs`,
           sound: true,
-          icon: "../assets/book-solid.png",
         },
         trigger: {
           seconds: 60,
@@ -180,7 +177,6 @@ const Study = () => {
           title: "Study Complete!!!",
           body: `You completed your study for "${name}" great job!`,
           sound: true,
-          icon: "../assets/book-solid.png",
         },
         trigger: {
           seconds: 60,
