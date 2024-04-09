@@ -35,6 +35,22 @@ const Home = ({ totalPoints, todo_list, activityLog }) => {
       stroke: "#FF6347"
     }
   }
+
+  const countTasksByMonth = () => {
+    const months = {};
+    activityLog.forEach(log => {
+      if (log.status === "Done") {
+        const month = new Date(log.timestamp).getMonth();
+        if (!months[month]) {
+          months[month] = 1;
+        } else {
+          months[month]++;
+        }
+      }
+    });
+    return Object.values(months);
+  };
+  
   const countTasksByCategory = () => {
     let personalCount = 0;
     let workCount = 0;
@@ -100,19 +116,7 @@ const Home = ({ totalPoints, todo_list, activityLog }) => {
                 labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Nov", "Dec"],
                 datasets: [
                   {
-                    data: [
-                      Math.random() * 100,
-                      Math.random() * 100,
-                      Math.random() * 100,
-                      Math.random() * 100,
-                      Math.random() * 100,
-                      Math.random() * 100,
-                      Math.random() * 100,
-                      Math.random() * 100,
-                      Math.random() * 100,
-                      Math.random() * 100,
-                      Math.random() * 100
-                    ]
+                    data: countTasksByMonth()
                   }
                 ]
               }}
