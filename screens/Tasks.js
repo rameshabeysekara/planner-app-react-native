@@ -13,9 +13,16 @@ import {
   Pressable,
   Alert,
   Keyboard,
+  Share,
 } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
-import { Button, TextInput, Card, Paragraph } from "react-native-paper";
+import {
+  Button,
+  TextInput,
+  Card,
+  Paragraph,
+  IconButton,
+} from "react-native-paper";
 import { FontAwesome as Icon } from "@expo/vector-icons";
 import { Octicons } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -69,6 +76,30 @@ const Tasks = ({
   const [selectedColor, setSelectedColor] = React.useState(null);
   const handleColorSelection = (color) => {
     setSelectedColor(color);
+  };
+
+  const onShare = async (item) => {
+    try {
+      const shareOptions = {
+        message: item.task,
+        subject: "Task from my planner app",
+      };
+
+      const result = await Share.share(shareOptions);
+
+      if (result.action === Share.sharedAction) {
+        if (result.activityType) {
+          console.log(`Shared via ${result.activityType}`);
+        } else {
+          console.log("Content shared successfully!");
+        }
+      } else if (result.action === Share.dismissedAction) {
+        console.log("Share action dismissed");
+      }
+    } catch (error) {
+      console.error("Error sharing content:", error.message);
+      alert("Oops! Something went wrong while sharing.");
+    }
   };
 
   const handleAddTodo = async () => {
@@ -586,13 +617,21 @@ const Tasks = ({
                           />
                         )}
                         right={(props) => (
-                          <ButtonIcon
-                            iconName="close"
-                            color="tomato"
-                            onPress={() => handleDeleteTodo(item.id)}
-                          />
+                          <View style={{ flexDirection: "row" }}>
+                            <IconButton
+                              icon="share"
+                              onPress={() => onShare(item)}
+                            />
+
+                            <ButtonIcon
+                              iconName="close"
+                              color="tomato"
+                              onPress={() => handleDeleteTodo(item.id)}
+                            />
+                          </View>
                         )}
                       />
+
                       <Card.Content>
                         <Paragraph style={{ paddingTop: 5, paddingBottom: 5 }}>
                           {item.task}
