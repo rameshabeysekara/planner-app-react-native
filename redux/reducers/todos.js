@@ -151,7 +151,7 @@ export default function (state = initialState, action) {
         id,
         title: statusTodo.title,
         task: statusTodo.task,
-        status: statusTodo.status,
+        status: status,
         timestamp: new Date().toISOString(), // Add timestamp
       };
       return {
