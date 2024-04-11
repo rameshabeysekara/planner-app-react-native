@@ -2,6 +2,7 @@ import React from "react";
 import ButtonIcon from "../components/ButtonIcon";
 import Spacer from "../components/Spacer";
 import Constants from "expo-constants";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import _ from "lodash";
 import {
   Text,
@@ -11,32 +12,47 @@ import {
   FlatList,
   Pressable,
   Alert,
+  Keyboard,
+  Share,
 } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
-import { Button, TextInput, Card, Paragraph } from "react-native-paper";
+import {
+  Button,
+  TextInput,
+  Card,
+  Paragraph,
+  IconButton,
+} from "react-native-paper";
 import { FontAwesome as Icon } from "@expo/vector-icons";
-import { connect } from "react-redux";
+import { Octicons } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { connect, useDispatch } from "react-redux";
+import moment from "moment";
 import {
   addTodo,
   deleteTodo,
   updateTodo,
   updateTotalPoints,
+  updateStatusTodo,
+  resetAllTasks,
 } from "../redux/actions";
-
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Tasks = ({
   todo_list,
   addTodo,
   deleteTodo,
   updateTodo,
+  updateStatusTodo,
   totalPoints,
   updateTotalPoints,
+  priorityLevels,
+  resetAllTasks,
 }) => {
   const [modalFormVisible, setModalFormVisible] = React.useState(false);
   const [title, setTitle] = React.useState("");
   const [task, setTask] = React.useState("");
   const [selectedDependency, setSelectedDependency] = React.useState(null);
+  const [selectedPriority, setSelectedPriority] = React.useState(0);
   const [modalEditMode, setModalEditMode] = React.useState(false);
   const [selectedItem, setSelectedItem] = React.useState(null);
   const [modalTask, setModalTask] = React.useState("");
@@ -47,23 +63,158 @@ const Tasks = ({
   const [filterType, setSelectedFilterType] = React.useState(null);
   const [filteredTasks, setFilteredTasks] = React.useState([]);
   const [selectedCategory, setSelectedCategory] = React.useState("");
+  const [notificationTriggered, setNotificationTriggered] =
+    React.useState(false);
+  const [statusMap, setStatusMap] = React.useState({});
+  const dispatch = useDispatch();
 
-  const handleAddTodo = () => {
+  const LL = moment().format("LL");
+  const ddd = moment().format("ddd");
+  const currentDate = `${LL} / ${ddd}`; // Apr 9, 2024 / Tue
+  const stampDate = moment().format("lll"); // Apr 9, 2024 12:00 AM
+  // const dateOnce = moment().add(1, 'days').calendar()
+
+  const [countdown, setCountdown] = React.useState("");
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      const hoursUntilEndOfDay = moment().endOf("day").diff(moment(), "hours");
+      const minutesUntilEndOfDay =
+        moment().endOf("day").diff(moment(), "minutes") % 60;
+
+      if (hoursUntilEndOfDay < 0) {
+        setCountdown("Your task has passed.");
+      } else {
+        setCountdown(
+          `${hoursUntilEndOfDay} hours and ${minutesUntilEndOfDay} minutes, until the end of this tasks.`
+        );
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const [dailyCountdown, setDailyCountdown] = React.useState("");
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      const endOfNextDay = moment().add(1, "days");
+      const diff = endOfNextDay.diff(moment());
+
+      if (diff < 0) {
+        setDailyCountdown("End of day has passed.");
+      } else {
+        setDailyCountdown(endOfNextDay.calendar());
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const [weeklyCountdown, setweeklyCountdown] = React.useState("");
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      const endOfWeek = moment().add(1, "week");
+      const diff = endOfWeek.diff(moment());
+
+      if (diff < 0) {
+        setweeklyCountdown("End of week has passed.");
+      } else {
+        const countdownDescription = moment()
+          .add(diff)
+          .format("MMMM D, YYYY / ddd");
+        setweeklyCountdown(`${countdownDescription}`);
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const [monthlyCountdown, setMonthlyCountdown] = React.useState("");
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      const endOfMonth = moment().endOf("month").add(1, "month");
+      const diff = endOfMonth.diff(moment());
+
+      const duration = moment.duration(diff);
+      const days = duration.days();
+      const hours = duration.hours();
+
+      if (diff < 0) {
+        setMonthlyCountdown("End of month has passed.");
+      } else {
+        setMonthlyCountdown(
+          `${days} days and ${hours} hours, until the end of the month.`
+        );
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const availableColors = [
+    { label: "Tomato", value: "#FF6347" },
+    { label: "Steel Blue", value: "#4682B4" },
+    { label: "Lime Green", value: "#32CD32" },
+    { label: "Blue Violet", value: "#8A2BE2" },
+    { label: "Orange", value: "#FFA500" },
+    { label: "Royal Blue", value: "#4169E1" },
+  ];
+
+  const [selectedColor, setSelectedColor] = React.useState(null);
+  const handleColorSelection = (color) => {
+    setSelectedColor(color);
+  };
+
+  const onShare = async (item) => {
+    try {
+      const shareOptions = {
+        message: item.task,
+        subject: "Task from my planner app",
+      };
+
+      const result = await Share.share(shareOptions);
+
+      if (result.action === Share.sharedAction) {
+        if (result.activityType) {
+          console.log(`Shared via ${result.activityType}`);
+        } else {
+          console.log("Content shared successfully!");
+        }
+      } else if (result.action === Share.dismissedAction) {
+        console.log("Share action dismissed");
+      }
+    } catch (error) {
+      console.error("Error sharing content:", error.message);
+      alert("Oops! Something went wrong while sharing.");
+    }
+  };
+
+  const handleAddTodo = async () => {
     if (task.trim() !== "") {
       if (title.trim() !== "") {
-        addTodo(
+        console.log(stampDate);
+        // Call addTodo function and store the returned id
+        const newTaskId = await addTodo(
           title,
           task,
           selectedIteration,
+          "On going", //STATUS DEFAULT VALUE
           selectedDependency,
-          selectedCategory
+          selectedCategory,
+          selectedColor,
+          selectedPriority.value,
+          stampDate
         );
+
+        // taskReminder(newTaskId);
         setTask("");
         setTitle("");
         setSelectedIteration(null);
         setSelectedDependency(null);
+        setSelectedPriority(0);
         setModalFormVisible(false);
         setSelectedCategory("");
+        setSelectedColor(null);
+        // setCurrentDates('')
       } else {
         // If the title is empty, prompt the user
         Alert.alert("Alert", "Do you want to add the task without a title?", [
@@ -78,13 +229,17 @@ const Tasks = ({
                 "",
                 task,
                 selectedIteration,
+                "On going", //STATUS DEFAULT VALUE
                 selectedDependency,
-                selectedCategory
+                selectedCategory,
+                selectedPriority.value
               );
+              // taskReminder("")
               setTask("");
               setTitle("");
               setSelectedIteration(null);
               setSelectedDependency(null);
+              setSelectedPriority(0);
               setModalFormVisible(false);
             },
           },
@@ -94,27 +249,56 @@ const Tasks = ({
       // If both fields are empty, show an alert
       Alert.alert("Alert", "Task Name cannot be empty", [
         {
-          text: "Cancel",
-          style: "cancel",
-        },
-        {
           text: "OK",
-          onPress: () => {
-            addTodo(
-              "",
-              task,
-              selectedIteration,
-              selectedDependency,
-              selectedCategory
-            );
-            setTask("");
-            setTitle("");
-            setSelectedDependency(null);
-            setModalFormVisible(false);
-          },
         },
       ]);
     }
+  };
+
+  const timers = {}; // Define the timers dictionary to store timers associated with tasks
+  const taskReminder = (newTask) => {
+    const taskId = newTask.payload.id;
+    const title = newTask.payload.title;
+
+    // Reset notificationTriggered to false
+    setNotificationTriggered(false);
+
+    // Initialize countdown variable to 60 seconds
+    let countdown = 30;
+
+    // Start a timer for the new task
+    const timer = setInterval(() => {
+      // Decrement the countdown
+      countdown--;
+
+      // Log the countdown value to the console
+      console.log(`${title} : ${countdown}sec.`);
+
+      // Check if 20 seconds are remaining and notification hasn't been triggered yet
+      if (countdown === 15 && !notificationTriggered) {
+        // Trigger the notification
+        Alert.alert("Reminder", `Your task "${title}" is about to Due.`, [
+          { text: "OK", onPress: () => {} },
+        ]);
+
+        // Set notificationTriggered to true to prevent multiple notifications
+        // setNotificationTriggered(true)
+      }
+
+      // Check if countdown reaches 0
+      if (countdown === 0) {
+        // Stop the timer
+        clearInterval(timer);
+
+        handleUpdateStatusTodo(taskId, "Due");
+
+        // Remove the timer from the timers dictionary
+        delete timers[title];
+      }
+    }, 1000); // 1000 milliseconds = 1 second
+
+    // Store the timer in a dictionary with task ID as key
+    timers[title] = timer;
   };
 
   // Function to handle updating a plan/task by its ID
@@ -122,7 +306,13 @@ const Tasks = ({
     // Check if the title is not empty
     if (modalTitle.trim() !== "") {
       // If title is not empty, update the plan/task with the provided ID, title, and task
-      updateTodo(id, modalTitle, modalTask, selectedDependency);
+      updateTodo(
+        id,
+        modalTitle,
+        modalTask,
+        selectedDependency,
+        selectedPriority.value
+      );
       // Hide the update modal
       setModalUpdateVisible(false);
     } else {
@@ -137,7 +327,13 @@ const Tasks = ({
           text: "Yes",
           onPress: () => {
             // If the user chooses to proceed without a title, update the plan/task with an empty title and the provided task
-            updateTodo(id, "", modalTask, selectedDependency);
+            updateTodo(
+              id,
+              "",
+              modalTask,
+              selectedDependency,
+              selectedPriority.value
+            );
             // Hide the update modal
             setModalUpdateVisible(false);
           },
@@ -183,6 +379,17 @@ const Tasks = ({
       label: "No Dependency",
       value: null,
     });
+    return dropdownData;
+  };
+
+  //get priority level types
+  const generatePriorityLevels = () => {
+    var priorityLevels = [0, 1, 2];
+    const dropdownData = priorityLevels.map((level) => ({
+      label: level == 2 ? "High" : level == 1 ? "Medium" : "Low",
+      value: level,
+    }));
+
     return dropdownData;
   };
 
@@ -259,89 +466,94 @@ const Tasks = ({
     loadStatusMap();
   }, []);
 
-  const [statusMap, setStatusMap] = React.useState({});
-
-  const taskStat = async (id, stat) => {
+  const handleUpdateStatusTodo = async (id, status) => {
     try {
       const currentTask = todo_list.find((task) => task.id === id);
 
-      let updatedStatusMap;
+      // Assuming statusMap is defined elsewhere
+      let updatedStatusMap = { ...statusMap };
 
-      if (stat === "Done") {
+      if (status === "Done") {
+        // Assuming currentTask is defined elsewhere
         const dependentTask = currentTask.dependentTaskId;
+
         if (dependentTask != null) {
           if (dependentTask.value != null) {
             if (statusMap.hasOwnProperty(dependentTask.value.toString())) {
               // Create a new object reference with updated statusMap
               updatedStatusMap = {
                 ...statusMap,
-                [id]: stat,
+                [id]: status,
               };
+
+              const updatedPoints = totalPoints + 10;
+              updateTotalPoints(updatedPoints);
+
               // Update the statusMap state
               setStatusMap(updatedStatusMap);
-              
-
               setModalUpdateVisible(false);
             } else {
               //if there is a dependency and status != done
               Alert.alert(
                 "Dependency Alert",
-                  `Completion of the task "${dependentTask.label}" is required before proceeding.`,
+                `Completion of the task "${dependentTask.label}" is required before proceeding.`,
                 [
                   {
                     text: "OK",
+                    onPress: () => {
+                      setModalUpdateVisible(false);
+                    },
                   },
                 ]
               );
-              return;
+              return; // Exit early if dependency is not completed
             }
           }
         }
 
+        // Call the updateStatusTodo function with the new status
+        updateStatusTodo(id, status);
+
+        updatedStatusMap = {
+          ...statusMap,
+          [id]: status,
+        };
+
         const updatedPoints = totalPoints + 10;
         updateTotalPoints(updatedPoints);
 
-        // If there is no dependency or dependency is completed
-        updatedStatusMap = {
-          ...statusMap,
-          [id]: stat,
-        };
-
-        
         setModalUpdateVisible(false);
       } else {
-        const updatedPoints = totalPoints > 10 ? totalPoints - 10 : 0;
-        updateTotalPoints(updatedPoints);
-        // Create a new object reference with updated statusMap
+        updateStatusTodo(id, status);
+
         updatedStatusMap = {
           ...statusMap,
-          [id]: "Due",
+          [id]: status,
         };
+        setStatusMap(updatedStatusMap);
       }
 
-      // Update the statusMap state
       setStatusMap(updatedStatusMap);
 
-       // Display congratulations alert
-            Alert.alert(
-              "Whoops 🥳",
-              `Task "${currentTask.title}" completed! You get 10 points 🎉`,
-              [
-                {
-                  text: "OK",
-                },
-              ]
-            );
+      if (status !== "Due") {
+        Alert.alert(
+          "Whoops 🥳",
+          `Task "${currentTask.title}" completed! You get 10 points 🎉`,
+          [
+            {
+              text: "OK",
+            },
+          ]
+        );
+      }
 
       // Save the updated statusMap to AsyncStorage
       await AsyncStorage.setItem("statusMap", JSON.stringify(updatedStatusMap));
     } catch (error) {
-      console.error(
-        "Error updating task status and saving to AsyncStorage:",
-        error
-      );
+      console.error("Error updating task status:", error);
+      console.error("Error stack trace:", error.stack); // Log the stack trace for more detailed information
     }
-  };
+  }; // END OF handleUpdateStatusTodo * * * * * * * * * * *
 
   // Function to open the modal for updating a selected plan/task
   const openModal = (item) => {
@@ -353,6 +565,8 @@ const Tasks = ({
     setModalTitle(item.title);
     // Set the modal dependency to the dependency ID of the selected item
     setSelectedDependency(item.dependencyId);
+    // Set the priority level of the task
+    setSelectedPriority(item.priority);
     // Set the visibility of the update modal to true, thus opening the modal
     setModalUpdateVisible(true);
     // Set the mode of the modal
@@ -361,8 +575,29 @@ const Tasks = ({
 
   // Function for Selected Iterations
   const handlePress = (option) => {
-    setSelectedIteration(option);
-    console.log("User selected iteration : ", option);
+    // setSelectedIteration(option)
+
+    if (option == "Once") {
+      console.log("Current Date : ", stampDate);
+      setSelectedIteration(countdown);
+    }
+
+    if (option == "Daily") {
+      console.log("Current Date : ", stampDate);
+      setSelectedIteration(dailyCountdown);
+    }
+
+    if (option == "Weekly") {
+      console.log("Current Date : ", stampDate);
+      setSelectedIteration(weeklyCountdown);
+    }
+
+    if (option == "Monthly") {
+      console.log("Current Date : ", stampDate);
+      setSelectedIteration(monthlyCountdown);
+    }
+
+    Keyboard.dismiss();
   };
 
   const filterClicked = () => {
@@ -371,10 +606,32 @@ const Tasks = ({
       return status === _.get(filterType, "value");
     });
     setFilteredTasks(filtered);
+    setFilterModalVisible(false);
   };
 
   const resetFilter = () => {
     setFilteredTasks([]);
+    setFilterModalVisible(false);
+  };
+
+  // SPRINT 04 | Allow user delete all tasks - app reset (user data) #9
+  // TO DO by RONALD
+  const handleResetTasks = () => {
+    Alert.alert("Confirm Reset", "This is to deleted all of your tasks.", [
+      {
+        text: "Cancel",
+        style: "cancel",
+        onPress: () => console.log("Reset canceled"),
+      },
+      {
+        text: "Reset",
+        style: "destructive",
+        onPress: () => {
+          dispatch(resetAllTasks()); // Dispatch the resetAllTasks action
+          console.log("Reset Tasks Press : ", stampDate);
+        },
+      },
+    ]);
   };
 
   return (
@@ -382,44 +639,107 @@ const Tasks = ({
       <View style={styles.content}>
         <Spacer />
         <View style={[styles.flatList]}>
+          {/* SPRINT 04 */}
+          <View style={styles.resetTaskAlign}>
+            <View style={{ flexDirection: "row", paddingLeft: 12 }}>
+              <Icon name="calendar" size={15} color="gray" />
+              {/* <MaterialCommunityIcons name="stamper" size={15} color="gray" /> */}
+              <Text
+                style={{
+                  fontSize: 15,
+                  alignSelf: "center",
+                  paddingLeft: 3,
+                  color: "gray",
+                }}
+              >
+                {/* Display Month date year and day */}
+                {currentDate}
+              </Text>
+            </View>
+            <Pressable onPress={handleResetTasks}>
+              <Text style={styles.resetTasks}>Reset Tasks</Text>
+            </Pressable>
+          </View>
+
           <FlatList
             data={filteredTasks.length > 0 ? filteredTasks : todo_list}
             keyExtractor={(item) => item.id}
             renderItem={({ item, index }) => {
               const status = statusMap[item.id] || "On going";
+
               const cardTitle = (
-                <Text
-                  style={{ color: "black", fontWeight: "bold", fontSize: 20 }}
-                >
-                  {" "}
-                  {item.title || "[ No Title ]"}
-                </Text>
+                <>
+                  <Text
+                    style={{ color: "black", fontWeight: "bold", fontSize: 20 }}
+                  >
+                    {item.title || "[ No Title ]"}{" "}
+                  </Text>
+                  <View style={styles.priorityCard}>
+                    {item.priority == 2 ? (
+                      <MaterialCommunityIcons
+                        name="chevron-triple-up"
+                        size={15}
+                        color="white"
+                      />
+                    ) : item.priority == 1 ? (
+                      <MaterialCommunityIcons
+                        name="chevron-double-up"
+                        size={15}
+                        color="white"
+                      />
+                    ) : (
+                      <MaterialCommunityIcons
+                        name="chevron-up"
+                        size={15}
+                        color="white"
+                      />
+                    )}
+                  </View>
+                </>
               );
-              const cardSubTitleColor = status === "Done" ? "green" : "gray";
+
+              const statusColor =
+                status === "Done" ? "green" : status === "Due" ? "red" : "gray";
+
               const cardSubTitle = (
-                <Text style={{ color: cardSubTitleColor, fontSize: 15 }}>
-                  Status : {status}{" "}
+                <Text style={{ color: statusColor, fontSize: 15 }}>
+                  {status}{" "}
                   {status === "On going" ? (
-                    <Icon name="hourglass-2" size={12} color={iconColor} />
+                    <Icon name="hourglass-2" size={12} color={statusColor} />
+                  ) : status === "Due" ? (
+                    <Icon
+                      name="calendar-times-o"
+                      size={17}
+                      color={statusColor}
+                    />
                   ) : (
-                    <Icon name="calendar-check-o" size={17} color={iconColor} />
+                    <Icon
+                      name="calendar-check-o"
+                      size={17}
+                      color={statusColor}
+                    />
                   )}
                 </Text>
               );
-              const iconColor = status === "Done" ? "green" : "gray";
+
+              const dateCreated = (
+                <Text style={{ fontSize: 12, color: "gray" }}>
+                  {item.dateCreated}
+                </Text>
+              );
+
               const dependentOn = (
                 <Paragraph
                   style={{ marginTop: 10, color: "tomato", fontSize: 12 }}
                 >
-                  {/* To Do = Imasha */}
-                  Dependent on :{" "}
+                  <Octicons name="workflow" size={15} color="grey" />{" "}
                   {item.dependentTaskId != null
                     ? item.dependentTaskId.label
-                    : "None"}
+                    : "No Dependency"}
                 </Paragraph>
               );
 
-              const period = item.iteration || "No Iteration Selected";
+              const period = item.iteration || "No Iteration";
 
               const pointsLabel = (
                 <View style={styles.pointsContainer}>
@@ -438,25 +758,41 @@ const Tasks = ({
               return (
                 <>
                   <Pressable key={item.id} onPress={() => openModal(item)}>
-                    <Card style={{ width: 365, marginTop: 12, margin: 6 }}>
+                    <Card
+                      style={{
+                        width: 365,
+                        marginTop: 6,
+                        borderColor: item.color?.value,
+                        borderWidth: 2,
+                      }}
+                    >
                       <Card.Title
                         title={<>{cardTitle}</>}
-                        subtitle={<>{cardSubTitle}</>}
+                        // subtitle={<>{cardSubTitle}</>}
+                        subtitle={dateCreated}
                         left={(props) => (
                           <CustomIcon
                             category={item.category}
-                            size={40}
-                            color={iconColor}
+                            size={31}
+                            color={statusColor}
                           />
                         )}
                         right={(props) => (
-                          <ButtonIcon
-                            iconName="close"
-                            color="red"
-                            onPress={() => handleDeleteTodo(item.id)}
-                          />
+                          <View style={{ flexDirection: "row" }}>
+                            <IconButton
+                              icon="share"
+                              onPress={() => onShare(item)}
+                            />
+
+                            <ButtonIcon
+                              iconName="close"
+                              color="tomato"
+                              onPress={() => handleDeleteTodo(item.id)}
+                            />
+                          </View>
                         )}
                       />
+
                       <Card.Content>
                         <Paragraph style={{ paddingTop: 5, paddingBottom: 5 }}>
                           {item.task}
@@ -468,7 +804,6 @@ const Tasks = ({
                             gap: -5,
                           }}
                         >
-                          {/* {dependentOn} */}
                           <View>{dependentOn}</View>
                           <View>
                             <Text
@@ -478,7 +813,12 @@ const Tasks = ({
                                 fontSize: 12,
                               }}
                             >
-                              Iteration : {period}
+                              <Octicons
+                                name="iterations"
+                                size={15}
+                                color="grey"
+                              />{" "}
+                              {period}
                             </Text>
                           </View>
                         </View>
@@ -524,6 +864,7 @@ const Tasks = ({
             setTitle("");
             setTask("");
             setSelectedDependency(null);
+            setSelectedPriority(0);
           }}
         >
           Create a Task
@@ -572,6 +913,7 @@ const Tasks = ({
                 data={[
                   { label: "On going", value: "On going" },
                   { label: "Done", value: "Done" },
+                  { label: "Due", value: "Due" },
                 ]}
                 value={filterType}
                 labelField="label"
@@ -650,88 +992,6 @@ const Tasks = ({
               </View>
               {!modalEditMode && (
                 <View>
-                  <View style={styles.separator}></View>
-                  <Text style={styles.label}>Select Iteration</Text>
-                  <View style={{ flexDirection: "row" }}>
-                    <Pressable
-                      style={({ pressed }) => [
-                        styles.iterationPress,
-                        selectedIteration === "Once" ? styles.selected : null,
-                        {
-                          backgroundColor: pressed
-                            ? "lightcoral"
-                            : selectedIteration === "Once"
-                              ? "tomato"
-                              : "lightgray",
-                        },
-                      ]}
-                      onPress={() => handlePress("Once")}
-                    >
-                      <Text style={{ fontWeight: "bold", color: "white" }}>
-                        Once
-                      </Text>
-                    </Pressable>
-
-                    <Pressable
-                      style={({ pressed }) => [
-                        styles.iterationPress,
-                        selectedIteration === "Daily" ? styles.selected : null,
-                        {
-                          backgroundColor: pressed
-                            ? "lightcoral"
-                            : selectedIteration === "Daily"
-                              ? "tomato"
-                              : "lightgray",
-                        },
-                      ]}
-                      onPress={() => handlePress("Daily")}
-                    >
-                      <Text style={{ fontWeight: "bold", color: "white" }}>
-                        Daily
-                      </Text>
-                    </Pressable>
-
-                    <Pressable
-                      style={({ pressed }) => [
-                        styles.iterationPress,
-                        selectedIteration === "Weekly" ? styles.selected : null,
-                        {
-                          backgroundColor: pressed
-                            ? "lightcoral"
-                            : selectedIteration === "Weekly"
-                              ? "tomato"
-                              : "lightgray",
-                        },
-                      ]}
-                      onPress={() => handlePress("Weekly")}
-                    >
-                      <Text style={{ fontWeight: "bold", color: "white" }}>
-                        Weekly
-                      </Text>
-                    </Pressable>
-
-                    <Pressable
-                      style={({ pressed }) => [
-                        styles.iterationPress,
-                        selectedIteration === "Monthly"
-                          ? styles.selected
-                          : null,
-                        {
-                          backgroundColor: pressed
-                            ? "lightcoral"
-                            : selectedIteration === "Monthly"
-                              ? "tomato"
-                              : "lightgray",
-                        },
-                      ]}
-                      onPress={() => handlePress("Monthly")}
-                    >
-                      <Text style={{ fontWeight: "bold", color: "white" }}>
-                        Monthly
-                      </Text>
-                    </Pressable>
-                  </View>
-                  <View style={styles.separator}></View>
                   <Text style={styles.label}>Select Category</Text>
                   <Dropdown
                     style={styles.dropdown}
@@ -746,7 +1006,6 @@ const Tasks = ({
                     onChange={(value) => setSelectedCategory(value)}
                   />
 
-                  <View style={styles.separator}></View>
                   <Text style={styles.label}>Select Dependency</Text>
                   <Dropdown
                     style={styles.dropdown}
@@ -756,10 +1015,126 @@ const Tasks = ({
                     search
                     labelField="label"
                     valueField="value"
-                    placeholder="No Dependency"
+                    placeholder="Select Dependency"
                     searchPlaceholder="Search..."
                     onChange={(value) => setSelectedDependency(value)}
                   />
+
+                  <Text style={styles.label}>Select Priority Level</Text>
+                  <Dropdown
+                    style={styles.dropdown}
+                    label="Low"
+                    data={generatePriorityLevels()}
+                    value={selectedPriority}
+                    search
+                    labelField="label"
+                    valueField="value"
+                    placeholder="Select a Priority Level"
+                    searchPlaceholder="Search..."
+                    onChange={(value) => setSelectedPriority(value)}
+                  />
+
+                  <Text style={styles.label}>Select Color</Text>
+                  <Dropdown
+                    style={styles.dropdown}
+                    label="Select Color"
+                    data={availableColors}
+                    value={selectedColor}
+                    search
+                    labelField="label"
+                    valueField="value"
+                    placeholder="Select a Color"
+                    searchPlaceholder="Search..."
+                    onChange={(color) => handleColorSelection(color)}
+                    maxHeight={180}
+                  />
+                  <Text style={styles.label}>Select Iteration</Text>
+                  <View style={{ flexDirection: "row" }}>
+                    {/* ONCE */}
+                    <Pressable
+                      style={({ pressed }) => [
+                        styles.iterationPress,
+                        selectedIteration === countdown
+                          ? styles.selected
+                          : null,
+                        {
+                          backgroundColor: pressed
+                            ? "lightcoral"
+                            : selectedIteration === countdown
+                              ? "tomato"
+                              : "lightgray",
+                        },
+                      ]}
+                      onPress={() => handlePress("Once")}
+                    >
+                      <Text style={{ fontWeight: "bold", color: "white" }}>
+                        Once
+                      </Text>
+                    </Pressable>
+                    {/* DAILY */}
+                    <Pressable
+                      style={({ pressed }) => [
+                        styles.iterationPress,
+                        selectedIteration === dailyCountdown
+                          ? styles.selected
+                          : null,
+                        {
+                          backgroundColor: pressed
+                            ? "lightcoral"
+                            : selectedIteration === dailyCountdown
+                              ? "tomato"
+                              : "lightgray",
+                        },
+                      ]}
+                      onPress={() => handlePress("Daily")}
+                    >
+                      <Text style={{ fontWeight: "bold", color: "white" }}>
+                        Daily
+                      </Text>
+                    </Pressable>
+                    {/* WEEKLY */}
+                    <Pressable
+                      style={({ pressed }) => [
+                        styles.iterationPress,
+                        selectedIteration === weeklyCountdown
+                          ? styles.selected
+                          : null,
+                        {
+                          backgroundColor: pressed
+                            ? "lightcoral"
+                            : selectedIteration === weeklyCountdown
+                              ? "tomato"
+                              : "lightgray",
+                        },
+                      ]}
+                      onPress={() => handlePress("Weekly")}
+                    >
+                      <Text style={{ fontWeight: "bold", color: "white" }}>
+                        Weekly
+                      </Text>
+                    </Pressable>
+                    {/* MONTHLY */}
+                    <Pressable
+                      style={({ pressed }) => [
+                        styles.iterationPress,
+                        selectedIteration === monthlyCountdown
+                          ? styles.selected
+                          : null,
+                        {
+                          backgroundColor: pressed
+                            ? "lightcoral"
+                            : selectedIteration === monthlyCountdown
+                              ? "tomato"
+                              : "lightgray",
+                        },
+                      ]}
+                      onPress={() => handlePress("Monthly")}
+                    >
+                      <Text style={{ fontWeight: "bold", color: "white" }}>
+                        Monthly
+                      </Text>
+                    </Pressable>
+                  </View>
                 </View>
               )}
             </View>
@@ -769,11 +1144,9 @@ const Tasks = ({
               {modalEditMode && (
                 <View style={{ flex: 1 }}>
                   <Button
-                    //labelStyle={{ fontWeight: "bold", color: "white" }}
-                    //style={{ backgroundColor: "green" }}
                     mode="contained"
                     onPress={() => {
-                      taskStat(selectedItem.id, "Done");
+                      handleUpdateStatusTodo(selectedItem.id, "Done");
                     }}
                     disabled={statusMap[selectedItem.id] === "Done"}
                   >
@@ -809,7 +1182,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   flatList: {
-    // paddingTop: Constants.statusBarHeight,
     marginTop: Constants.statusBarHeight,
     flexGrow: 1,
     paddingBottom: Constants.statusBarHeight,
@@ -824,6 +1196,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginBottom: 5,
     color: "tomato",
+    marginTop: 10,
   },
   dropdown: {
     height: 50,
@@ -916,7 +1289,7 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     padding: 4,
     marginRight: 5,
-    shadowColor: "#000",
+    shadowColor: "black",
     shadowOffset: {
       width: 0,
       height: 2,
@@ -926,9 +1299,38 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   pointsText: {
-    color: "black",
+    color: "grey",
     padding: 4,
     fontWeight: "bold",
+  },
+
+  priorityCard: {
+    backgroundColor: "tomato",
+    borderRadius: 10,
+    minWidth: 10,
+    height: 20,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 5,
+    paddingVertical: 2,
+  },
+  priorityText: {
+    color: "white",
+    fontSize: 12,
+    fontWeight: "bold",
+  },
+  // SPRINT 04
+  resetTaskAlign: {
+    width: 366,
+    paddingRight: 15,
+    justifyContent: "space-between",
+    flexDirection: "row",
+    // backgroundColor : 'gray',
+  },
+  resetTasks: {
+    alignSelf: "flex-end",
+    color: "red",
+    fontSize: 18,
   },
 });
 
@@ -943,7 +1345,9 @@ const mapDispatchToProps = {
   addTodo,
   deleteTodo,
   updateTodo,
+  updateStatusTodo,
   updateTotalPoints,
+  resetAllTasks,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Tasks);
