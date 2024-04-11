@@ -1,26 +1,31 @@
-import { ADD_TODO, DELETE_TODO, UPDATE_TODO, ADD_TO_ACTIVITY_LOG } from "../actionTypes";
+import { ADD_TODO, DELETE_TODO, UPDATE_TODO, ADD_TO_ACTIVITY_LOG, UPDATE_TOTAL_POINTS } from "../actionTypes";
 
 const initialState = {
   todo_list: [],
   activityLog: [],
+  totalPoints: 0,
 };
 
 export default function (state = initialState, action) {
   switch (action.type) {
     case ADD_TODO: {
-  const { id, task, title, dependentTaskId } = action.payload;
+  const { id, task, title, iteration, dependentTaskId, category } = action.payload;
+  const points = 10;
   const log = {
     type: "Added Task",
     id,
     title,
     task,
-    dependentTaskId
+    iteration,
+    dependentTaskId,
+    category,
+    points
   };
 
   return {
     ...state,
-    todo_list: [...state.todo_list, { id, task, title, dependentTaskId }],
-    activityLog: [log, ...(Array.isArray(state.activityLog) ? state.activityLog : [])],
+    todo_list: [...state.todo_list, { id, task, title, iteration, dependentTaskId, category, points }],
+    activityLog: [log, ...(Array.isArray(state.activityLog) ? state.activityLog : [])]
   };
 }
 
@@ -42,7 +47,7 @@ export default function (state = initialState, action) {
           }
           return todo;
         }),
-        activityLog: [log, ...(Array.isArray(state.activityLog) ? state.activityLog : [])],
+        activityLog: [log, ...(Array.isArray(state.activityLog) ? state.activityLog : [])]
       };
     }
 
@@ -75,6 +80,13 @@ export default function (state = initialState, action) {
           },
           ...state.activityLog,
         ],
+      };
+    }
+
+    case UPDATE_TOTAL_POINTS: {
+      return {
+        ...state,
+        totalPoints: action.payload,
       };
     }
 
