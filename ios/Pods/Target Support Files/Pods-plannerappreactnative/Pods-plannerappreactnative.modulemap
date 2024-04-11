@@ -1,0 +1,6 @@
+module Pods_plannerappreactnative {
+  umbrella header "Pods-plannerappreactnative-umbrella.h"
+
+  export *
+  module * { export * }
+}
