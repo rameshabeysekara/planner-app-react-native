@@ -42,7 +42,6 @@ export default function (state = initialState, action) {
         color,
         points,
         priority,
-        timestamp: new Date().toISOString(), 
         dateCreated,
       };
       console.log( "LOG : ", log )
