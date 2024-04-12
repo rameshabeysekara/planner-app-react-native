@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, Keyboard } from "react-native";
 import { TextInput, Button, Text, Snackbar, Card } from "react-native-paper";
 
 const Weather = () => {
@@ -31,6 +31,8 @@ const Weather = () => {
       setError("Error fetching weather data. Please try again later.");
       console.error("Error fetching weather data: ", error);
     }
+
+    Keyboard.dismiss();
   };
 
   return (

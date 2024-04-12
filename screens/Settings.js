@@ -25,13 +25,13 @@ const Settings = ({ navigation }) => {
         </TouchableOpacity>
 
         {/* for other screens */}
-        <TouchableOpacity onPress={navigateToOtherScreen}>
+        {/* <TouchableOpacity onPress={navigateToOtherScreen}>
           <ListItem bottomDivider containerStyle={{ marginTop: 5 }}>
             <ListItem.Content>
               <ListItem.Title>Notifications</ListItem.Title>
             </ListItem.Content>
           </ListItem>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
 
         {/* Add more items as needed */}
       </View>

@@ -256,50 +256,50 @@ const Tasks = ({
   };
 
   const timers = {}; // Define the timers dictionary to store timers associated with tasks
-  const taskReminder = (newTask) => {
-    const taskId = newTask.payload.id;
-    const title = newTask.payload.title;
+  // const taskReminder = (newTask) => {
+  //   const taskId = newTask.payload.id;
+  //   const title = newTask.payload.title;
 
-    // Reset notificationTriggered to false
-    setNotificationTriggered(false);
+  //   // Reset notificationTriggered to false
+  //   setNotificationTriggered(false);
 
-    // Initialize countdown variable to 60 seconds
-    let countdown = 30;
+  //   // Initialize countdown variable to 60 seconds
+  //   let countdown = 30;
 
-    // Start a timer for the new task
-    const timer = setInterval(() => {
-      // Decrement the countdown
-      countdown--;
+  //   // Start a timer for the new task
+  //   const timer = setInterval(() => {
+  //     // Decrement the countdown
+  //     countdown--;
 
-      // Log the countdown value to the console
-      console.log(`${title} : ${countdown}sec.`);
+  //     // Log the countdown value to the console
+  //     console.log(`${title} : ${countdown}sec.`);
 
-      // Check if 20 seconds are remaining and notification hasn't been triggered yet
-      if (countdown === 15 && !notificationTriggered) {
-        // Trigger the notification
-        Alert.alert("Reminder", `Your task "${title}" is about to Due.`, [
-          { text: "OK", onPress: () => {} },
-        ]);
+  //     // Check if 20 seconds are remaining and notification hasn't been triggered yet
+  //     if (countdown === 15 && !notificationTriggered) {
+  //       // Trigger the notification
+  //       Alert.alert("Reminder", `Your task "${title}" is about to Due.`, [
+  //         { text: "OK", onPress: () => {} },
+  //       ]);
 
-        // Set notificationTriggered to true to prevent multiple notifications
-        // setNotificationTriggered(true)
-      }
+  //       // Set notificationTriggered to true to prevent multiple notifications
+  //       // setNotificationTriggered(true)
+  //     }
 
-      // Check if countdown reaches 0
-      if (countdown === 0) {
-        // Stop the timer
-        clearInterval(timer);
+  //     // Check if countdown reaches 0
+  //     if (countdown === 0) {
+  //       // Stop the timer
+  //       clearInterval(timer);
 
-        handleUpdateStatusTodo(taskId, "Due");
+  //       handleUpdateStatusTodo(taskId, "Due");
 
-        // Remove the timer from the timers dictionary
-        delete timers[title];
-      }
-    }, 1000); // 1000 milliseconds = 1 second
+  //       // Remove the timer from the timers dictionary
+  //       delete timers[title];
+  //     }
+  //   }, 1000); // 1000 milliseconds = 1 second
 
-    // Store the timer in a dictionary with task ID as key
-    timers[title] = timer;
-  };
+  //   // Store the timer in a dictionary with task ID as key
+  //   timers[title] = timer;
+  // };
 
   // Function to handle updating a plan/task by its ID
   const handleupdateTodo = (id) => {
@@ -311,7 +311,7 @@ const Tasks = ({
         modalTitle,
         modalTask,
         selectedDependency,
-        selectedPriority.value
+        // selectedPriority.value
       );
       // Hide the update modal
       setModalUpdateVisible(false);
